@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const fsPromises = require('fs').promises;
 const path = require('path');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -39,20 +40,22 @@ passport.serializeUser((user, done) => {
   done(null, user);
 });
 
-passport.deserializeUser((user, done) => {
-  fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
-    if (err) return done(err);
+passport.deserializeUser(async (user, done) => {
+  try {
+    const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
     const authorizedUsers = JSON.parse(data);
     const foundUser = authorizedUsers.find(u => u.email === user.email);
 
     if (foundUser) {
-      // Update the user object in the session with the latest isAdmin status
       done(null, { ...user, isAdmin: foundUser.isAdmin });
     } else {
-      // User no longer authorized
       done(null, false);
     }
-  });
+  } catch (err) {
+    console.error('Error deserializing user from authorized_users.json:', err);
+    console.error('Corrupted data:', data);
+    done(err);
+  }
 });
 
 // --- Middleware ---
@@ -82,20 +85,16 @@ app.get('/auth/google/callback',
 
 app.get('/logout', (req, res) => {
   req.logout((err) => {
-    if (err) { return next(err); }
+    if (err) { console.error('Error during logout:', err); }
     res.redirect('/');
   });
 });
 
 // Middleware to check if user is authenticated
-const isAuthenticated = (req, res, next) => {
+const isAuthenticated = async (req, res, next) => {
   if (req.isAuthenticated()) {
-    // Re-fetch user data to ensure isAdmin status is up-to-date
-    fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading authorized users in isAuthenticated middleware:', err);
-        return res.status(500).send('Internal Server Error');
-      }
+    try {
+      const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
       const authorizedUsers = JSON.parse(data);
       const foundUser = authorizedUsers.find(u => u.email === req.user.email);
 
@@ -110,7 +109,11 @@ const isAuthenticated = (req, res, next) => {
           res.status(401).send('Unauthorized: Your account is no longer authorized.');
         });
       }
-    });
+    } catch (err) {
+      console.error('Error reading authorized users in isAuthenticated middleware:', err);
+      console.error('Corrupted data in isAuthenticated:', data);
+      return res.status(500).send('Internal Server Error');
+    }
   } else {
     res.status(401).send('Unauthorized');
   }
@@ -225,20 +228,19 @@ app.delete('/api/events/:id', isAuthenticated, (req, res) => {
 });
 
 // Admin routes
-app.get('/api/admin/users', isAdmin, (req, res) => {
-  fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).send('Error reading authorized users.');
-    }
+app.get('/api/admin/users', isAdmin, async (req, res) => {
+  try {
+    const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
     res.json(JSON.parse(data));
-  });
+  } catch (err) {
+    console.error('Error reading authorized users:', err);
+    res.status(500).send('Error reading authorized users.');
+  }
 });
 
-app.post('/api/admin/users', isAdmin, (req, res) => {
-  fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).send('Error reading authorized users.');
-    }
+app.post('/api/admin/users', isAdmin, async (req, res) => {
+  try {
+    const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
     const authorizedUsers = JSON.parse(data);
     const { email, isAdmin: newIsAdmin } = req.body;
 
@@ -252,20 +254,17 @@ app.post('/api/admin/users', isAdmin, (req, res) => {
 
     authorizedUsers.push({ email, isAdmin: !!newIsAdmin }); // Ensure isAdmin is boolean
 
-    fs.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2), (err) => {
-      if (err) {
-        return res.status(500).send('Error writing authorized users.');
-      }
-      res.status(201).json(authorizedUsers);
-    });
-  });
+    await fsPromises.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2));
+    res.status(201).json(authorizedUsers);
+  } catch (err) {
+    console.error('Error adding user:', err);
+    res.status(500).send('Error adding user.');
+  }
 });
 
-app.put('/api/admin/users', isAdmin, (req, res) => {
-  fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).send('Error reading authorized users.');
-    }
+app.put('/api/admin/users', isAdmin, async (req, res) => {
+  try {
+    const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
     let authorizedUsers = JSON.parse(data);
     const { email, isAdmin: updatedIsAdmin } = req.body;
 
@@ -286,20 +285,17 @@ app.put('/api/admin/users', isAdmin, (req, res) => {
 
     authorizedUsers[userIndex].isAdmin = !!updatedIsAdmin;
 
-    fs.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2), (err) => {
-      if (err) {
-        return res.status(500).send('Error writing authorized users.');
-      }
-      res.status(200).json(authorizedUsers);
-    });
-  });
+    await fsPromises.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2));
+    res.status(200).json(authorizedUsers);
+  } catch (err) {
+    console.error('Error updating admin status:', err);
+    res.status(500).send('Error updating admin status.');
+  }
 });
 
-app.delete('/api/admin/users', isAdmin, (req, res) => {
-  fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
-    if (err) {
-      return res.status(500).send('Error reading authorized users.');
-    }
+app.delete('/api/admin/users', isAdmin, async (req, res) => {
+  try {
+    const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
     let authorizedUsers = JSON.parse(data);
     const emailToDelete = req.body.email;
 
@@ -324,13 +320,12 @@ app.delete('/api/admin/users', isAdmin, (req, res) => {
       return res.status(404).send('User not found.');
     }
 
-    fs.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2), (err) => {
-      if (err) {
-        return res.status(500).send('Error writing authorized users.');
-      }
-      res.status(200).json(authorizedUsers);
-    });
-  });
+    await fsPromises.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2));
+    res.status(200).json(authorizedUsers);
+  } catch (err) {
+    console.error('Error deleting user:', err);
+    res.status(500).send('Error deleting user.');
+  }
 });
 
 // The "catchall" handler: for any request that doesn't

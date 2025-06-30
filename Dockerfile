@@ -28,12 +28,7 @@ COPY server/package.json server/package-lock.json ./
 RUN npm install --production
 
 # Dynamically create .env and authorized_users.json using build arguments
-RUN echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" > .env && \
-    echo "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}" >> .env && \
-    echo "SESSION_SECRET=${SESSION_SECRET}" >> .env && \
-    echo "ADMIN_EMAIL=${SUPER_ADMIN_EMAIL}" >> .env
-
-RUN echo "[ { \"email\": \"${SUPER_ADMIN_EMAIL}\", \"isAdmin\": true }, { \"email\": \"${NORMAL_USER_EMAIL}\", \"isAdmin\": false } ]" > authorized_users.json
+RUN echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" > .env &&     echo "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}" >> .env &&     echo "SESSION_SECRET=${SESSION_SECRET}" >> .env &&     echo "ADMIN_EMAIL=${SUPER_ADMIN_EMAIL}" >> .env
 
 COPY server/ ./
 
