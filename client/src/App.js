@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MyCalendar from './components/Calendar';
 import AdminPanel from './components/AdminPanel';
+import AdminDropdown from './components/AdminDropdown';
 import './styles/App.css';
 
 function App() {
@@ -28,8 +29,9 @@ function App() {
           {user ? (
             <div className="flex items-center space-x-4">
               <span className="text-sm">Welcome, {user.email}</span>
+              {user.isAdmin && <AdminDropdown currentUser={user} />}
               <button onClick={handleLogout} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Logout</button>
-            </>
+            </div>
           ) : (
             <button onClick={handleLogin}>Login with Google</button>
           )}
@@ -39,7 +41,6 @@ function App() {
         {user ? (
           <>
             <MyCalendar user={user} />
-            {user.isAdmin && <AdminPanel currentUser={user} />}
           </>
         ) : (
           <p>Please log in to view the calendar.</p>
