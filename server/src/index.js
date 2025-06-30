@@ -86,7 +86,7 @@ app.get('/auth/google/callback',
 app.get('/logout', (req, res) => {
   req.logout((err) => {
     if (err) { console.error('Error during logout:', err); }
-    res.redirect('/');
+    res.redirect('/logout-success');
   });
 });
 

@@ -5,7 +5,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f0f8ff;
+  background-color: #1a202c;
+  color: #e2e8f0;
 }
 
 code {
@@ -14,7 +15,7 @@ code {
 }
 
 .rbc-toolbar button {
-  background-color: #4caf50;
+  background-color: #2d3748;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -28,5 +29,28 @@ code {
 }
 
 .rbc-event {
-  background-color: #007bff;
+  background-color: #4299e1;
+}
+
+.rbc-header {
+  background-color: #2d3748;
+  color: #e2e8f0;
+}
+
+.rbc-month-view,
+.rbc-time-view,
+.rbc-agenda-view {
+  background-color: #1a202c;
+}
+
+.rbc-off-range-bg {
+  background-color: #2d3748;
+}
+
+.rbc-today {
+  background-color: #4299e1;
+}
+
+.rbc-row-segment .rbc-event-content {
+  color: #e2e8f0;
 }

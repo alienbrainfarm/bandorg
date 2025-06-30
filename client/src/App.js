@@ -3,10 +3,15 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import MyCalendar from './components/Calendar';
 import AddUsersPage from './pages/AddUsersPage';
 import ManageUsersPage from './pages/ManageUsersPage';
+import LogoutSuccessPage from './pages/LogoutSuccessPage';
 import './styles/App.css';
 
 function App() {
   const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
 
   useEffect(() => {
     fetch('/api/current_user')
@@ -19,13 +24,13 @@ function App() {
   };
 
   const handleLogout = () => {
-    window.location.href = '/logout';
+    window.location.href = '/logout-success';
   };
 
   return (
     <Router>
-      <div className="flex flex-col items-center min-h-screen py-2">
-        <header className="bg-gray-800 w-full p-4 text-white">
+      <div className="flex flex-col items-center min-h-screen py-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
+        <header className="bg-gray-800 dark:bg-gray-900 w-full p-4 text-white">
           <h1>Band Calendar Hub</h1>
           <nav className="flex justify-between items-center">
             {user ? (
@@ -43,11 +48,12 @@ function App() {
             )}
           </nav>
         </header>
-        <main className="flex-grow p-4">
+        <main className="flex-grow p-4 w-full">
           <Routes>
             <Route path="/" element={user ? <MyCalendar user={user} /> : <p>Please log in to view the calendar.</p>} />
             <Route path="/add-users" element={user && user.isAdmin ? <AddUsersPage /> : <p>Access Denied</p>} />
             <Route path="/manage-users" element={user && user.isAdmin ? <ManageUsersPage currentUser={user} /> : <p>Access Denied</p>} />
+            <Route path="/logout-success" element={<LogoutSuccessPage />} />
           </Routes>
         </main>
       </div>

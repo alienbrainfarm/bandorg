@@ -44,7 +44,7 @@ function AddUsersPage() {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 dark:bg-gray-800 dark:text-white">
       <h2 className="text-2xl font-bold mb-4">Add New Users</h2>
       {newUsers.map((user, index) => (
         <div key={index} className="flex items-center space-x-4 mb-2">
@@ -53,7 +53,7 @@ function AddUsersPage() {
             placeholder="User Email"
             value={user.email}
             onChange={(e) => handleUserChange(index, 'email', e.target.value)}
-            className="border p-2 rounded flex-grow"
+            className="border p-2 rounded flex-grow dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <label className="flex items-center space-x-2">
             <input

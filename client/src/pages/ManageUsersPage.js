@@ -61,20 +61,20 @@ const ManageUsersPage = ({ currentUser }) => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 dark:bg-gray-800 dark:text-white">
       <h2 className="text-2xl font-bold mb-4">Manage Authorized Users</h2>
       <div className="mb-4">
         <Link to="/add-users" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Add New Users
         </Link>
       </div>
-      <ul className="bg-white shadow overflow-hidden sm:rounded-md divide-y divide-gray-200">
+      <ul className="bg-white shadow overflow-hidden sm:rounded-md divide-y divide-gray-200 dark:bg-gray-700 dark:divide-gray-600">
         {users.length > 0 ? (
           users.map((user, index) => (
             <li key={index} className="px-4 py-4 sm:px-6 flex justify-between items-center">
               <div>
-                <p className="text-lg font-medium text-gray-900">{user.email}</p>
-                <p className="text-sm text-gray-500">{user.isAdmin ? 'Admin' : 'Regular User'}</p>
+                <p className="text-lg font-medium text-gray-900 dark:text-white">{user.email}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-300">{user.isAdmin ? 'Admin' : 'Regular User'}</p>
               </div>
               <div className="space-x-2">
                 {currentUser && currentUser.email !== user.email && (
@@ -97,7 +97,7 @@ const ManageUsersPage = ({ currentUser }) => {
             </li>
           ))
         ) : (
-          <li className="px-4 py-4 sm:px-6 text-gray-500">No authorized users found.</li>
+          <li className="px-4 py-4 sm:px-6 text-gray-500 dark:text-gray-300">No authorized users found.</li>
         )}
       </ul>
       <div className="mt-4">

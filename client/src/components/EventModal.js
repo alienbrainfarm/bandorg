@@ -36,7 +36,7 @@ const EventModal = ({ event, onClose, onSave, onDelete, currentUser }) => {
 
   return (
     <div className="event-modal-overlay">
-      <div className="event-modal">
+      <div className="event-modal dark">
         <h2>Event Details</h2>
         <p><strong>Title:</strong>
           {(isCreator || isAdmin) ? (
