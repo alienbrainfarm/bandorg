@@ -21,21 +21,21 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className="flex flex-col items-center min-h-screen py-2">
+      <header className="bg-gray-800 w-full p-4 text-white">
         <h1>Band Calendar Hub</h1>
-        <nav>
+        <nav className="flex justify-between items-center">
           {user ? (
-            <>
-              <span>Welcome, {user.email}</span>
-              <button onClick={handleLogout}>Logout</button>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm">Welcome, {user.email}</span>
+              <button onClick={handleLogout} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Logout</button>
             </>
           ) : (
             <button onClick={handleLogin}>Login with Google</button>
           )}
         </nav>
       </header>
-      <main>
+      <main className="flex-grow p-4">
         {user ? (
           <>
             <MyCalendar user={user} />
