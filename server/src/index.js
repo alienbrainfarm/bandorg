@@ -40,7 +40,19 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((user, done) => {
-  done(null, user);
+  fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
+    if (err) return done(err);
+    const authorizedUsers = JSON.parse(data);
+    const foundUser = authorizedUsers.find(u => u.email === user.email);
+
+    if (foundUser) {
+      // Update the user object in the session with the latest isAdmin status
+      done(null, { ...user, isAdmin: foundUser.isAdmin });
+    } else {
+      // User no longer authorized
+      done(null, false);
+    }
+  });
 });
 
 // --- Middleware ---
@@ -144,8 +156,8 @@ app.put('/api/events/:id', isAuthenticated, (req, res) => {
 
     const eventToUpdate = db.events[eventIndex];
 
-    if (eventToUpdate.createdBy !== req.user.email) {
-      return res.status(403).send('Forbidden: You can only edit events you created.');
+    if (eventToUpdate.createdBy !== req.user.email && !req.user.isAdmin) {
+      return res.status(403).send('Forbidden: You can only edit events you created or if you are an admin.');
     }
 
     const updatedEvent = { ...eventToUpdate, ...req.body, lastUpdatedBy: req.user.email };

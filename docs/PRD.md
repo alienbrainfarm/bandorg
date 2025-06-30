@@ -254,6 +254,13 @@ A private web application that enables band members to share and coordinate cale
 | `createdBy` | String  | The email of the user who created the event.     |
 | `lastUpdatedBy` | String  | The email of the user who last updated the event. |
 
+#### `authorized_users` table
+
+| Field       | Type    | Description                                  |
+|-------------|---------|----------------------------------------------|
+| `email`     | String  | The email address of the authorized user.    |
+| `isAdmin`   | Boolean | Whether the user has admin privileges.       |
+
 ---
 
 **Document Purpose:** Technical specification for AI-assisted development
