@@ -90,9 +90,29 @@ app.get('/logout', (req, res) => {
 // Middleware to check if user is authenticated
 const isAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) {
-    return next();
+    // Re-fetch user data to ensure isAdmin status is up-to-date
+    fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading authorized users in isAuthenticated middleware:', err);
+        return res.status(500).send('Internal Server Error');
+      }
+      const authorizedUsers = JSON.parse(data);
+      const foundUser = authorizedUsers.find(u => u.email === req.user.email);
+
+      if (foundUser) {
+        req.user.isAdmin = foundUser.isAdmin; // Update isAdmin status
+        return next();
+      } else {
+        // User no longer authorized, log them out
+        req.logout((err) => {
+          if (err) { console.error('Error logging out unauthorized user:', err); }
+          res.status(401).send('Unauthorized: Your account is no longer authorized.');
+        });
+      }
+    });
+  } else {
+    res.status(401).send('Unauthorized');
   }
-  res.status(401).send('Unauthorized');
 };
 
 // Middleware to check if user is admin

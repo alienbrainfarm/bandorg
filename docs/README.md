@@ -32,22 +32,11 @@ Band Calendar Hub enables bands to centralize rehearsal schedules, performance d
 
 ## Local Development Setup
 
-### 1. Environment Variables (`server/.env`)
-Create a file named `.env` in the `server/` directory with the following content. Replace the placeholder values with your actual credentials:
+### 1. Environment Variables
 
-```
-# Google OAuth Client ID - Obtain this from Google Cloud Console
-GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID_HERE
+For local development and testing, the `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `SESSION_SECRET` are expected to be set as environment variables in your shell or passed as build arguments to Docker. The `ADMIN_EMAIL` and a `NORMAL_USER_EMAIL` are now passed as build arguments to the Dockerfile.
 
-# Google OAuth Client Secret - Obtain this from Google Cloud Console
-GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET_HERE
-
-# Session Secret - A long, random string for session encryption
-SESSION_SECRET=YOUR_STRONG_RANDOM_SESSION_SECRET_HERE
-
-# Admin Email - The email address of the default admin user
-ADMIN_EMAIL=john@alien-planet.net
-```
+**Important:** Never hardcode sensitive credentials directly into your code or commit them to version control.
 
 ### 2. Google Cloud Platform (GCP) OAuth Setup Hints
 To obtain your `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`:
@@ -75,10 +64,21 @@ npm install # in the server directory
 npm start # in the root directory to start both client and server
 ```
 
-Alternatively, to run with Docker:
+Alternatively, to run with Docker, you must pass the `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SESSION_SECRET`, `SUPER_ADMIN_EMAIL`, and `NORMAL_USER_EMAIL` as build arguments:
 
 ```bash
-docker build -t bandorg .
+docker build \
+  --build-arg GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID \
+  --build-arg GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET \
+  --build-arg SESSION_SECRET=YOUR_SESSION_SECRET \
+  --build-arg SUPER_ADMIN_EMAIL=your.admin@example.com \
+  --build-arg NORMAL_USER_EMAIL=your.user@example.com \
+  -t bandorg .
+```
+
+Then, run the Docker container:
+
+```bash
 docker run -p 3001:3001 bandorg
 ```
 
