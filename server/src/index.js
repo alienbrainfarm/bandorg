@@ -101,6 +101,7 @@ const isAuthenticated = (req, res, next) => {
 
       if (foundUser) {
         req.user.isAdmin = foundUser.isAdmin; // Update isAdmin status
+        console.log(`isAuthenticated: User ${req.user.email}, isAdmin: ${req.user.isAdmin}`);
         return next();
       } else {
         // User no longer authorized, log them out
@@ -176,6 +177,7 @@ app.put('/api/events/:id', isAuthenticated, (req, res) => {
 
     const eventToUpdate = db.events[eventIndex];
 
+    console.log(`PUT /api/events/:id: User ${req.user.email}, isAdmin: ${req.user.isAdmin}`);
     if (eventToUpdate.createdBy !== req.user.email && !req.user.isAdmin) {
       return res.status(403).send('Forbidden: You can only edit events you created or if you are an admin.');
     }

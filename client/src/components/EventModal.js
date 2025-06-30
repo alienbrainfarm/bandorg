@@ -39,21 +39,21 @@ const EventModal = ({ event, onClose, onSave, onDelete, currentUser }) => {
       <div className="event-modal">
         <h2>Event Details</h2>
         <p><strong>Title:</strong>
-          {isCreator ? (
+          {(isCreator || isAdmin) ? (
             <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
           ) : (
             <span> {event.title}</span>
           )}
         </p>
         <p><strong>Start:</strong>
-          {isCreator ? (
+          {(isCreator || isAdmin) ? (
             <input type="datetime-local" value={formatDateTimeLocal(start)} onChange={(e) => setStart(e.target.value)} />
           ) : (
             <span> {new Date(start).toLocaleString()}</span>
           )}
         </p>
         <p><strong>End:</strong>
-          {isCreator ? (
+          {(isCreator || isAdmin) ? (
             <input type="datetime-local" value={formatDateTimeLocal(end)} onChange={(e) => setEnd(e.target.value)} />
           ) : (
             <span> {new Date(end).toLocaleString()}</span>
@@ -64,7 +64,7 @@ const EventModal = ({ event, onClose, onSave, onDelete, currentUser }) => {
 
         {(isCreator || isAdmin) && (
           <div className="event-actions">
-            {isCreator && <button onClick={handleSave}>Save Changes</button>}
+            {(isCreator || isAdmin) && <button onClick={handleSave}>Save Changes</button>}
             {(isCreator || isAdmin) && <button onClick={handleDelete} className="delete-button">Delete Event</button>}
           </div>
         )}
