@@ -24,11 +24,10 @@ passport.use(new GoogleStrategy({
     const authorizedUsers = JSON.parse(data);
     const userEmail = profile.emails[0].value;
 
-    if (authorizedUsers.includes(userEmail)) {
-      const user = { email: userEmail, id: profile.id };
-      if (userEmail === process.env.ADMIN_EMAIL) {
-        user.isAdmin = true;
-      }
+    const foundUser = authorizedUsers.find(u => u.email === userEmail);
+
+    if (foundUser) {
+      const user = { email: userEmail, id: profile.id, isAdmin: foundUser.isAdmin };
       return cb(null, user);
     } else {
       return cb(null, false, { message: 'Unauthorized email.' });
@@ -118,12 +117,75 @@ app.post('/api/events', isAuthenticated, (req, res) => {
     const db = JSON.parse(data);
     const newEvent = req.body;
     newEvent.id = Date.now();
+    newEvent.createdBy = req.user.email;
+    newEvent.lastUpdatedBy = req.user.email;
     db.events.push(newEvent);
     fs.writeFile(dbPath, JSON.stringify(db, null, 2), (err) => {
       if (err) {
         return res.status(500).send('Error writing to database.');
       }
       res.status(201).json(newEvent);
+    });
+  });
+});
+
+app.put('/api/events/:id', isAuthenticated, (req, res) => {
+  fs.readFile(dbPath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).send('Error reading database.');
+    }
+    let db = JSON.parse(data);
+    const eventId = parseInt(req.params.id);
+    const eventIndex = db.events.findIndex(e => e.id === eventId);
+
+    if (eventIndex === -1) {
+      return res.status(404).send('Event not found.');
+    }
+
+    const eventToUpdate = db.events[eventIndex];
+
+    if (eventToUpdate.createdBy !== req.user.email) {
+      return res.status(403).send('Forbidden: You can only edit events you created.');
+    }
+
+    const updatedEvent = { ...eventToUpdate, ...req.body, lastUpdatedBy: req.user.email };
+    db.events[eventIndex] = updatedEvent;
+
+    fs.writeFile(dbPath, JSON.stringify(db, null, 2), (err) => {
+      if (err) {
+        return res.status(500).send('Error writing to database.');
+      }
+      res.status(200).json(updatedEvent);
+    });
+  });
+});
+
+app.delete('/api/events/:id', isAuthenticated, (req, res) => {
+  fs.readFile(dbPath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).send('Error reading database.');
+    }
+    let db = JSON.parse(data);
+    const eventId = parseInt(req.params.id);
+    const eventIndex = db.events.findIndex(e => e.id === eventId);
+
+    if (eventIndex === -1) {
+      return res.status(404).send('Event not found.');
+    }
+
+    const eventToDelete = db.events[eventIndex];
+
+    if (eventToDelete.createdBy !== req.user.email && !req.user.isAdmin) {
+      return res.status(403).send('Forbidden: You can only delete events you created or if you are an admin.');
+    }
+
+    db.events = db.events.filter(e => e.id !== eventId);
+
+    fs.writeFile(dbPath, JSON.stringify(db, null, 2), (err) => {
+      if (err) {
+        return res.status(500).send('Error writing to database.');
+      }
+      res.status(204).send(); // No Content
     });
   });
 });
@@ -144,18 +206,58 @@ app.post('/api/admin/users', isAdmin, (req, res) => {
       return res.status(500).send('Error reading authorized users.');
     }
     const authorizedUsers = JSON.parse(data);
-    const newUserEmail = req.body.email;
-    if (newUserEmail && !authorizedUsers.includes(newUserEmail)) {
-      authorizedUsers.push(newUserEmail);
-      fs.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2), (err) => {
-        if (err) {
-          return res.status(500).send('Error writing authorized users.');
-        }
-        res.status(201).json(authorizedUsers);
-      });
-    } else {
-      res.status(400).send('Invalid or existing email.');
+    const { email, isAdmin: newIsAdmin } = req.body;
+
+    if (!email) {
+      return res.status(400).send('Email is required.');
     }
+
+    if (authorizedUsers.some(u => u.email === email)) {
+      return res.status(400).send('User with this email already exists.');
+    }
+
+    authorizedUsers.push({ email, isAdmin: !!newIsAdmin }); // Ensure isAdmin is boolean
+
+    fs.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2), (err) => {
+      if (err) {
+        return res.status(500).send('Error writing authorized users.');
+      }
+      res.status(201).json(authorizedUsers);
+    });
+  });
+});
+
+app.put('/api/admin/users', isAdmin, (req, res) => {
+  fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
+    if (err) {
+      return res.status(500).send('Error reading authorized users.');
+    }
+    let authorizedUsers = JSON.parse(data);
+    const { email, isAdmin: updatedIsAdmin } = req.body;
+
+    if (!email) {
+      return res.status(400).send('Email is required.');
+    }
+
+    const userIndex = authorizedUsers.findIndex(u => u.email === email);
+
+    if (userIndex === -1) {
+      return res.status(404).send('User not found.');
+    }
+
+    // Prevent changing admin status of the primary admin (from .env)
+    if (email === process.env.ADMIN_EMAIL && updatedIsAdmin === false) {
+      return res.status(403).send('Cannot demote the primary admin user.');
+    }
+
+    authorizedUsers[userIndex].isAdmin = !!updatedIsAdmin;
+
+    fs.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2), (err) => {
+      if (err) {
+        return res.status(500).send('Error writing authorized users.');
+      }
+      res.status(200).json(authorizedUsers);
+    });
   });
 });
 
@@ -166,17 +268,34 @@ app.delete('/api/admin/users', isAdmin, (req, res) => {
     }
     let authorizedUsers = JSON.parse(data);
     const emailToDelete = req.body.email;
-    if (emailToDelete && authorizedUsers.includes(emailToDelete) && emailToDelete !== process.env.ADMIN_EMAIL) {
-      authorizedUsers = authorizedUsers.filter(email => email !== emailToDelete);
-      fs.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2), (err) => {
-        if (err) {
-          return res.status(500).send('Error writing authorized users.');
-        }
-        res.status(200).json(authorizedUsers);
-      });
-    } else {
-      res.status(400).send('Invalid email or cannot delete admin.');
+
+    if (!emailToDelete) {
+      return res.status(400).send('Email is required.');
     }
+
+    // Prevent user from deleting themselves
+    if (emailToDelete === req.user.email) {
+      return res.status(403).send('Cannot delete your own account.');
+    }
+
+    // Prevent deleting the primary admin (from .env)
+    if (emailToDelete === process.env.ADMIN_EMAIL) {
+      return res.status(403).send('Cannot delete the primary admin user.');
+    }
+
+    const initialLength = authorizedUsers.length;
+    authorizedUsers = authorizedUsers.filter(u => u.email !== emailToDelete);
+
+    if (authorizedUsers.length === initialLength) {
+      return res.status(404).send('User not found.');
+    }
+
+    fs.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2), (err) => {
+      if (err) {
+        return res.status(500).send('Error writing authorized users.');
+      }
+      res.status(200).json(authorizedUsers);
+    });
   });
 });
 

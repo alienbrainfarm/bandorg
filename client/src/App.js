@@ -38,8 +38,8 @@ function App() {
       <main>
         {user ? (
           <>
-            <MyCalendar />
-            {user.isAdmin && <AdminPanel />}
+            <MyCalendar user={user} />
+            {user.isAdmin && <AdminPanel currentUser={user} />}
           </>
         ) : (
           <p>Please log in to view the calendar.</p>

@@ -66,6 +66,9 @@ A private web application that enables band members to share and coordinate cale
 - **FR-8:** Categorize events (rehearsal, performance, meeting, etc.)
 - **FR-9:** Set event details (date, time, location, description)
 - **FR-10:** View all band members' availability for specific dates
+- **FR-11:** Users can edit their own created events (including title, start, and end times).
+- **FR-12:** Users can delete their own created events.
+- **FR-13:** Admin users can delete any event.
 
 ### 5.3 User Interface
 - **FR-11:** Mobile-first responsive design optimized for smartphone usage
@@ -74,12 +77,18 @@ A private web application that enables band members to share and coordinate cale
 - **FR-14:** Quick event creation with minimal taps and mobile-optimized forms
 - **FR-15:** Visual indicators for different event types with clear mobile visibility
 - **FR-16:** Optimized text size and contrast for mobile readability
+- **FR-17:** Clicking on an event opens a modal displaying event details, with options to edit (for creator) or delete (for creator).
 
 ### 5.4 Admin Features
 - **FR-15:** Admin dashboard for user management
 - **FR-16:** Bulk import of authorized email addresses
 - **FR-17:** Audit log of user access and changes
 - **FR-18:** System configuration settings
+- **FR-19:** Admin users can promote other authorized users to admin status.
+- **FR-20:** Admin users can demote other admin users (except the primary admin).
+- **FR-21:** Admin users can add new authorized users with specified admin status.
+- **FR-22:** Admin users can remove authorized users (except the primary admin and themselves).
+- **FR-23:** Users (including admins) cannot remove their own accounts.
 
 ## 6. Non-Functional Requirements
 
@@ -242,6 +251,8 @@ A private web application that enables band members to share and coordinate cale
 | `end`       | String  | The end date and time of the event (ISO 8601 format).   |
 | `allDay`    | Boolean | Whether the event is an all-day event.       |
 | `resource`  | Any     | Any other custom data associated with the event. |
+| `createdBy` | String  | The email of the user who created the event.     |
+| `lastUpdatedBy` | String  | The email of the user who last updated the event. |
 
 ---
 

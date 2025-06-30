@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-const AdminPanel = () => {
+const AdminPanel = ({ currentUser }) => {
   const [users, setUsers] = useState([]);
   const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserIsAdmin, setNewUserIsAdmin] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -20,25 +21,55 @@ const AdminPanel = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email: newUserEmail }),
+      body: JSON.stringify({ email: newUserEmail, isAdmin: newUserIsAdmin }),
     })
       .then(res => res.json())
       .then(data => {
         setUsers(data);
         setNewUserEmail('');
-      });
+        setNewUserIsAdmin(false);
+      })
+      .catch(error => alert('Error adding user: ' + error.message));
   };
 
-  const handleDeleteUser = (email) => {
+  const handleToggleAdmin = (email, currentIsAdmin) => {
     fetch('/api/admin/users', {
-      method: 'DELETE',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, isAdmin: !currentIsAdmin }),
     })
-      .then(res => res.json())
-      .then(data => setUsers(data));
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        } else {
+          throw new Error('Failed to update user admin status.');
+        }
+      })
+      .then(data => setUsers(data))
+      .catch(error => alert('Error updating admin status: ' + error.message));
+  };
+
+  const handleDeleteUser = (email) => {
+    if (window.confirm(`Are you sure you want to delete ${email}?`)) {
+      fetch('/api/admin/users', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+        .then(res => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            throw new Error('Failed to delete user.');
+          }
+        })
+        .then(data => setUsers(data))
+        .catch(error => alert('Error deleting user: ' + error.message));
+    }
   };
 
   return (
@@ -46,10 +77,19 @@ const AdminPanel = () => {
       <h2>Admin Panel</h2>
       <h3>Authorized Users</h3>
       <ul>
-        {users.map((email, index) => (
+        {users.map((user, index) => (
           <li key={index}>
-            {email}
-            <button onClick={() => handleDeleteUser(email)}>Delete</button>
+            {user.email} {user.isAdmin ? '(Admin)' : ''}
+            {currentUser && currentUser.email !== user.email && (
+              <button onClick={() => handleToggleAdmin(user.email, user.isAdmin)}>
+                {user.isAdmin ? 'Demote' : 'Promote to Admin'}
+              </button>
+            )}
+            {currentUser && currentUser.email !== user.email && (
+              <button onClick={() => handleDeleteUser(user.email)} className="delete-button">
+                Delete
+              </button>
+            )}
           </li>
         ))}
       </ul>
@@ -60,6 +100,14 @@ const AdminPanel = () => {
         onChange={(e) => setNewUserEmail(e.target.value)}
         placeholder="Enter user email"
       />
+      <label>
+        <input
+          type="checkbox"
+          checked={newUserIsAdmin}
+          onChange={(e) => setNewUserIsAdmin(e.target.checked)}
+        />
+        Is Admin
+      </label>
       <button onClick={handleAddUser}>Add User</button>
     </div>
   );
