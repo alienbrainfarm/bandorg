@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './EventModal.css';
 
 const EventModal = ({ event, onClose, onSave, onDelete, currentUser }) => {
   const [title, setTitle] = useState(event.title);
@@ -21,13 +22,11 @@ const EventModal = ({ event, onClose, onSave, onDelete, currentUser }) => {
 
   const handleSave = () => {
     onSave({ ...event, title, start: new Date(start), end: new Date(end) });
-    onClose();
   };
 
   const handleDelete = () => {
     if (window.confirm(`Are you sure you want to delete "${event.title}"?`)) {
       onDelete(event.id);
-      onClose();
     }
   };
 
@@ -64,11 +63,10 @@ const EventModal = ({ event, onClose, onSave, onDelete, currentUser }) => {
 
         {(isCreator || isAdmin) && (
           <div className="event-actions">
-            {(isCreator || isAdmin) && <button onClick={handleSave}>Save Changes</button>}
-            {(isCreator || isAdmin) && <button onClick={handleDelete} className="delete-button">Delete Event</button>}
+            {(isCreator || isAdmin) && <button onClick={handleSave}>Save</button>}
+            {(isCreator || isAdmin) && <button onClick={handleDelete} className="delete-button">Delete</button>}
           </div>
         )}
-        <button onClick={onClose} className="close-button">Close</button>
       </div>
     </div>
   );

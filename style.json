@@ -1,0 +1,101 @@
+{
+  "component": "Calendar",
+  "style": {
+    "theme": "Dark",
+    "backgroundColor": "#3D3057",
+    "accentColors": {
+      "blue": "#4DD0E1",
+      "purple": "#BA68C8",
+      "yellow": "#FFB74D",
+      "pink": "#F06292"
+    },
+    "font": {
+      "family": "Sans-serif",
+      "color": "#FFFFFF",
+      "weights": {
+        "header": "700",
+        "normal": "400"
+      }
+    },
+    "borderRadius": "12px",
+    "shadows": "subtle inner + outer shadows for depth"
+  },
+  "structure": {
+    "header": {
+      "position": "top",
+      "elements": [
+        { "type": "icon", "position": "left", "shape": "hamburger", "bgColor": "#80DEEA", "corner": "top-left" },
+        { "type": "title", "text": "CALENDAR", "alignment": "center", "fontSize": "14px", "color": "#CCCCCC" },
+        { "type": "icon", "position": "right", "shape": "plus", "bgColor": "#FFA726", "corner": "top-right" }
+      ]
+    },
+    "monthLabel": {
+      "text": "Month name (e.g., July)",
+      "alignment": "center",
+      "fontSize": "24px",
+      "fontWeight": "bold",
+      "color": "#FFFFFF"
+    },
+    "navigation": {
+      "arrows": {
+        "left": true,
+        "right": true,
+        "style": "minimal",
+        "color": "#FFFFFF"
+      }
+    },
+    "calendarGrid": {
+      "weekHeader": {
+        "days": ["S", "M", "T", "W", "T", "F", "S"],
+        "fontSize": "12px",
+        "color": "#CCCCCC"
+      },
+      "dateCells": {
+        "size": "equal circular/rounded squares",
+        "hoverEffect": false,
+        "selectedStates": {
+          "singleDate": { "bgColor": "event color", "textColor": "#FFFFFF" },
+          "multiDateRange": {
+            "start": { "rounded": true, "bgColor": "#BA68C8" },
+            "middle": { "bgColor": "#BA68C8" },
+            "end": { "rounded": true, "bgColor": "#BA68C8" }
+          }
+        }
+      }
+    },
+    "eventList": {
+      "sectionLabel": {
+        "text": "Upcoming",
+        "fontSize": "16px",
+        "fontWeight": "600",
+        "color": "#FFFFFF",
+        "paddingTop": "12px"
+      },
+      "eventItem": {
+        "containerColor": "#4A3C66",
+        "padding": "12px",
+        "borderRadius": "8px",
+        "spacing": "10px vertical",
+        "items": [
+          {
+            "title": { "fontSize": "14px", "fontWeight": "bold", "color": "#FFFFFF" },
+            "date": { "fontSize": "12px", "color": "#AAAAAA" },
+            "timeBadge": {
+              "bgColor": "event color",
+              "textColor": "#FFFFFF",
+              "fontSize": "12px",
+              "shape": "pill",
+              "alignment": "right"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "interaction": {
+    "navigationClick": "Change month",
+    "eventClick": "Show event details",
+    "dateHover": "No hover effect",
+    "addButtonClick": "Trigger event creation modal"
+  }
+}

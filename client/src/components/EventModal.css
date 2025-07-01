@@ -1,0 +1,71 @@
+/* /Users/johnhaley/bandorg/client/src/components/EventModal.css */
+
+.event-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.event-modal {
+  background-color: #4A3C66;
+  padding: 20px;
+  border-radius: 12px;
+  color: #FFFFFF;
+  width: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  position: relative; /* Added for positioning buttons */
+}
+
+.event-modal h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #FFFFFF;
+}
+
+.event-modal p {
+  margin-bottom: 15px;
+}
+
+.event-modal input[type="text"],
+.event-modal input[type="datetime-local"] {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #80DEEA;
+  background-color: #3D3057;
+  color: #FFFFFF;
+}
+
+.event-modal .event-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px; /* Space between buttons */
+}
+
+.event-modal button {
+  padding: 8px 15px; /* Adjusted padding for shorter buttons */
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px; /* Adjusted font size */
+}
+
+.event-modal .delete-button {
+  background-color: #F06292;
+  color: #FFFFFF;
+}
+
+.event-modal .save-button {
+  background-color: #4DD0E1;
+  color: #FFFFFF;
+}

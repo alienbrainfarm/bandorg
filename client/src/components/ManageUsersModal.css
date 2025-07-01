@@ -1,0 +1,122 @@
+/* /Users/johnhaley/bandorg/client/src/components/ManageUsersModal.css */
+
+.manage-users-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.manage-users-modal {
+  background-color: #4A3C66;
+  padding: 20px;
+  border-radius: 12px;
+  color: #FFFFFF;
+  width: 600px; /* Adjust as needed */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.manage-users-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.manage-users-modal h2 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.manage-users-modal .close-button {
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.manage-users-modal .add-user-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.manage-users-modal .add-user-form input[type="email"] {
+  flex-grow: 1;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #80DEEA;
+  background-color: #3D3057;
+  color: #FFFFFF;
+}
+
+.manage-users-modal .add-user-form button {
+  padding: 8px 15px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: #4DD0E1;
+  color: #FFFFFF;
+}
+
+.manage-users-modal .user-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.manage-users-modal .user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #3D3057;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.manage-users-modal .user-email {
+  font-weight: bold;
+}
+
+.manage-users-modal .user-role {
+  font-size: 0.9em;
+  color: #CCCCCC;
+}
+
+.manage-users-modal .user-actions button {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.manage-users-modal .promote-button {
+  background-color: #BA68C8;
+  color: #FFFFFF;
+}
+
+.manage-users-modal .demote-button {
+  background-color: #FFB74D;
+  color: #FFFFFF;
+}
+
+.manage-users-modal .delete-button {
+  background-color: #F06292;
+  color: #FFFFFF;
+}
+
+.manage-users-modal .no-users {
+  text-align: center;
+  padding: 20px;
+  color: #CCCCCC;
+}

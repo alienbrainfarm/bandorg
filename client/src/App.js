@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import MyCalendar from './components/Calendar';
-import AddUsersPage from './pages/AddUsersPage';
-import ManageUsersPage from './pages/ManageUsersPage';
+import CustomCalendar from './components/Calendar';
+import ManageUsersModal from './components/ManageUsersModal';
 import LogoutSuccessPage from './pages/LogoutSuccessPage';
+import DayView from './pages/DayView';
+import WeekView from './pages/WeekView';
+import YearView from './pages/YearView';
 import './styles/App.css';
 
 function App() {
@@ -30,31 +32,22 @@ function App() {
   return (
     <Router>
       <div className="flex flex-col items-center min-h-screen py-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
-        <header className="bg-gray-800 dark:bg-gray-900 w-full p-4 text-white">
-          <h1>Band Calendar Hub</h1>
-          <nav className="flex justify-between items-center">
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm">Welcome, {user.email}</span>
-                {user.isAdmin && (
-                  <Link to="/manage-users" className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Admin
-                  </Link>
-                )}
-                <button onClick={handleLogout} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Logout</button>
-              </div>
-            ) : (
-              <button onClick={handleLogin}>Login with Google</button>
-            )}
-          </nav>
-        </header>
+        
         <main className="flex-grow p-4 w-full">
-          <Routes>
-            <Route path="/" element={user ? <MyCalendar user={user} /> : <p>Please log in to view the calendar.</p>} />
-            <Route path="/add-users" element={user && user.isAdmin ? <AddUsersPage /> : <p>Access Denied</p>} />
-            <Route path="/manage-users" element={user && user.isAdmin ? <ManageUsersPage currentUser={user} /> : <p>Access Denied</p>} />
-            <Route path="/logout-success" element={<LogoutSuccessPage />} />
-          </Routes>
+          {user ? (
+            <Routes>
+              <Route path="/" element={<CustomCalendar user={user} />} />
+              
+              <Route path="/day" element={<DayView user={user} />} />
+              <Route path="/week" element={<WeekView user={user} />} />
+              <Route path="/year" element={<YearView user={user} />} />
+            </Routes>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full">
+              <p className="mb-4">Please log in to view the calendar.</p>
+              <button onClick={handleLogin} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Login with Google</button>
+            </div>
+          )}
         </main>
       </div>
     </Router>
