@@ -21,35 +21,47 @@ if (process.env.NODE_ENV !== 'test') {
     callbackURL: '/auth/google/callback'
   },
   (accessToken, refreshToken, profile, cb) => {
+    console.log('GoogleStrategy callback: profile.emails[0].value', profile.emails[0].value);
     fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
-      if (err) return cb(err);
+      if (err) {
+        console.error('Error reading authorized_users.json in GoogleStrategy:', err);
+        return cb(err);
+      }
+      console.log('GoogleStrategy callback: authorizedUsersPath', authorizedUsersPath);
+      console.log('GoogleStrategy callback: authorized_users.json content', data);
       const authorizedUsers = JSON.parse(data);
-      const userEmail = profile.emails[0].value;
+      const userEmail = profile.emails[0].value.toLowerCase();
 
       const foundUser = authorizedUsers.find(u => u.email === userEmail);
 
       if (foundUser) {
+        console.log('GoogleStrategy callback: foundUser.email', foundUser.email);
         const user = { email: userEmail, id: profile.id, isAdmin: foundUser.isAdmin };
         return cb(null, user);
       } else {
+        console.log('GoogleStrategy callback: Unauthorized email', userEmail);
         return cb(null, false, { message: 'Unauthorized email.' });
       }
     });
   }));
 
   passport.serializeUser((user, done) => {
+    console.log('Serializing user:', user);
     done(null, user);
   });
 
   passport.deserializeUser(async (user, done) => {
+    console.log('Deserializing user:', user);
     try {
       const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
       const authorizedUsers = JSON.parse(data);
-      const foundUser = authorizedUsers.find(u => u.email === user.email);
+      const foundUser = authorizedUsers.find(u => u.email.toLowerCase() === user.email.toLowerCase());
 
       if (foundUser) {
+        console.log('Deserialized user found:', { ...user, isAdmin: foundUser.isAdmin });
         done(null, { ...user, isAdmin: foundUser.isAdmin });
       } else {
+        console.log('Deserialized user not found in authorized_users.json');
         done(null, false);
       }
     } catch (err) {
@@ -79,7 +91,7 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // Serve static files from the React app
-const clientBuildPath = path.join(process.cwd(), 'client', 'build');
+const clientBuildPath = '/app/client/build';
 app.use(express.static(clientBuildPath));
 
 // --- Authentication Routes ---
@@ -101,10 +113,29 @@ app.get('/logout', (req, res) => {
 
 // Middleware to check if user is authenticated
 const isAuthenticated = async (req, res, next) => {
-  if (process.env.NODE_ENV === 'test' || req.isAuthenticated()) {
-    return next();
+  if (req.isAuthenticated()) {
+    try {
+      const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
+      const authorizedUsers = JSON.parse(data);
+      const foundUser = authorizedUsers.find(u => u.email.toLowerCase() === req.user.email.toLowerCase());
+
+      if (foundUser) {
+        req.user.isAdmin = foundUser.isAdmin; // Update isAdmin status
+        return next();
+      } else {
+        // User no longer authorized, log them out
+        req.logout((err) => {
+          if (err) { console.error('Error logging out unauthorized user:', err); }
+          res.status(401).send('Unauthorized: Your account is no longer authorized.');
+        });
+      }
+    } catch (err) {
+      console.error('Error reading authorized users in isAuthenticated middleware:', err);
+      return res.status(500).send('Internal Server Error');
+    }
+  } else {
+    res.status(401).send('Unauthorized');
   }
-  res.status(401).send('Unauthorized');
 };
 
 // Middleware to check if user is admin
@@ -117,6 +148,7 @@ const isAdmin = (req, res, next) => {
 
 // --- API Routes ---
 app.get('/api/current_user', (req, res) => {
+  console.log('/api/current_user: req.user', req.user);
   if (req.user) {
     res.json({ email: req.user.email, isAdmin: req.user.isAdmin });
   } else {
@@ -235,11 +267,11 @@ app.post('/api/admin/users', isAdmin, async (req, res) => {
       return res.status(400).send('Email is required.');
     }
 
-    if (authorizedUsers.some(u => u.email === email)) {
+    if (authorizedUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
       return res.status(400).send('User with this email already exists.');
     }
 
-    authorizedUsers.push({ email, isAdmin: !!newIsAdmin }); // Ensure isAdmin is boolean
+    authorizedUsers.push({ email: email.toLowerCase(), isAdmin: !!newIsAdmin }); // Ensure isAdmin is boolean
 
     await fsPromises.writeFile(authorizedUsersPath, JSON.stringify(authorizedUsers, null, 2));
     res.status(201).json(authorizedUsers);
@@ -259,7 +291,7 @@ app.put('/api/admin/users', isAdmin, async (req, res) => {
       return res.status(400).send('Email is required.');
     }
 
-    const userIndex = authorizedUsers.findIndex(u => u.email === email);
+    const userIndex = authorizedUsers.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
 
     if (userIndex === -1) {
       return res.status(404).send('User not found.');
@@ -291,17 +323,17 @@ app.delete('/api/admin/users', isAdmin, async (req, res) => {
     }
 
     // Prevent user from deleting themselves
-    if (emailToDelete === req.user.email) {
+    if (emailToDelete.toLowerCase() === req.user.email.toLowerCase()) {
       return res.status(403).send('Cannot delete your own account.');
     }
 
     // Prevent deleting the primary admin (from .env)
-    if (emailToDelete === process.env.ADMIN_EMAIL) {
+    if (emailToDelete.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase()) {
       return res.status(403).send('Cannot delete the primary admin user.');
     }
 
     const initialLength = authorizedUsers.length;
-    authorizedUsers = authorizedUsers.filter(u => u.email !== emailToDelete);
+    authorizedUsers = authorizedUsers.filter(u => u.email.toLowerCase() !== emailToDelete.toLowerCase());
 
     if (authorizedUsers.length === initialLength) {
       return res.status(404).send('User not found.');

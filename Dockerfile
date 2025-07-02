@@ -19,18 +19,23 @@ FROM node:18
 
 WORKDIR /app
 
-# Define build arguments for user emails
-ARG SUPER_ADMIN_EMAIL
-ARG NORMAL_USER_EMAIL
+ARG GOOGLE_CLIENT_ID
+ARG GOOGLE_CLIENT_SECRET
+ARG SESSION_SECRET
+ARG ADMIN_EMAIL
 
 COPY server/package.json server/package-lock.json ./
 
 RUN npm install --production
 
-# Dynamically create .env and authorized_users.json using build arguments
-RUN echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" > .env &&     echo "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}" >> .env &&     echo "SESSION_SECRET=${SESSION_SECRET}" >> .env &&     echo "ADMIN_EMAIL=${SUPER_ADMIN_EMAIL}" >> .env
+# Dynamically create .env using build arguments
+RUN echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}" > .env &&     echo "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}" >> .env &&     echo "SESSION_SECRET=${SESSION_SECRET}" >> .env
 
 COPY server/ ./
+
+ENV ADMIN_EMAIL=${ADMIN_EMAIL}
+
+RUN echo "[ { \"email\": \"$(echo ${ADMIN_EMAIL} | tr '[:upper:]' '[:lower:]')\", \"isAdmin\": true } ]" > authorized_users.json
 
 COPY --from=build /app/client/build ./client/build
 
