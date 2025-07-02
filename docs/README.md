@@ -15,11 +15,11 @@ Band Calendar Hub enables bands to centralize rehearsal schedules, performance d
 - Audit log and admin dashboard
 
 ## Technology Stack
-- **Frontend:** React.js or Vue.js, Tailwind CSS
-- **Backend:** Node.js/Express.js or Python/FastAPI
-- **Database:** Google Cloud Firestore
-- **Authentication:** Firebase Auth (Google OAuth)
-- **Hosting:** Google Cloud Run (serverless)
+- **Frontend:** React.js, Tailwind CSS
+- **Backend:** Node.js/Express.js
+- **Database:** Local JSON file (`db.json`)
+- **Authentication:** Passport.js with Google OAuth2.0 Strategy
+- **Hosting:** Docker (local development)
 
 ## Documentation Contents
 - `PRD.md`: Full Product Requirements Document
@@ -34,7 +34,7 @@ Band Calendar Hub enables bands to centralize rehearsal schedules, performance d
 
 ### 1. Environment Variables
 
-For local development and testing, the `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `SESSION_SECRET` are expected to be set as environment variables in your shell or passed as build arguments to Docker. The `ADMIN_EMAIL` and a `NORMAL_USER_EMAIL` are now passed as build arguments to the Dockerfile.
+For local development and testing, the `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `SESSION_SECRET` are expected to be set as environment variables in your shell or passed as build arguments to Docker.
 
 **Important:** Never hardcode sensitive credentials directly into your code or commit them to version control.
 
@@ -64,15 +64,13 @@ npm install # in the server directory
 npm start # in the root directory to start both client and server
 ```
 
-Alternatively, to run with Docker, you must pass the `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `SESSION_SECRET`, `SUPER_ADMIN_EMAIL`, and `NORMAL_USER_EMAIL` as build arguments:
+Alternatively, to run with Docker, you must pass the `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `SESSION_SECRET` as build arguments:
 
 ```bash
 docker build \
   --build-arg GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID \
   --build-arg GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET \
   --build-arg SESSION_SECRET=YOUR_SESSION_SECRET \
-  --build-arg SUPER_ADMIN_EMAIL=your.admin@example.com \
-  --build-arg NORMAL_USER_EMAIL=your.user@example.com \
   -t bandorg .
 ```
 

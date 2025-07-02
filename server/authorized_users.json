@@ -1,6 +1,1 @@
-[
-  {
-    "email": "john@alien-planet.net",
-    "isAdmin": true
-  }
-]
+[{"email":"admin@example.com","isAdmin":true},{"email":"user@example.com","isAdmin":false}]

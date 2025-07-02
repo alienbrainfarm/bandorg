@@ -42,4 +42,51 @@ describe('Events API', () => {
         done();
       });
   });
+
+  it('should update an event', (done) => {
+    const newEvent = {
+      id: 1,
+      title: 'Test Event',
+      start: new Date().toISOString(),
+      end: new Date().toISOString(),
+      createdBy: 'test@example.com'
+    };
+    fs.writeFile(dbPath, JSON.stringify({ events: [newEvent] }, null, 2), () => {
+      const updatedEvent = { ...newEvent, title: 'Updated Test Event' };
+      request(app)
+        .put('/api/events/1')
+        .send(updatedEvent)
+        .expect(200)
+        .end((err, res) => {
+          if (err) return done(err);
+          expect(res.body).to.be.an('object');
+          expect(res.body.title).to.equal('Updated Test Event');
+          done();
+        });
+    });
+  });
+
+  it('should delete an event', (done) => {
+    const newEvent = {
+      id: 1,
+      title: 'Test Event',
+      start: new Date().toISOString(),
+      end: new Date().toISOString(),
+      createdBy: 'test@example.com'
+    };
+    fs.writeFile(dbPath, JSON.stringify({ events: [newEvent] }, null, 2), () => {
+      request(app)
+        .delete('/api/events/1')
+        .expect(204)
+        .end((err, res) => {
+          if (err) return done(err);
+          fs.readFile(dbPath, 'utf8', (err, data) => {
+            if (err) return done(err);
+            const db = JSON.parse(data);
+            expect(db.events).to.be.an('array').that.is.empty;
+            done();
+          });
+        });
+    });
+  });
 });
