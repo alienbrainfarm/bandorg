@@ -1,3 +1,11 @@
 {
-  "events": []
+  "events": [
+    {
+      "id": 1,
+      "title": "Test Event",
+      "start": "2025-07-02T14:16:41.543Z",
+      "end": "2025-07-02T14:16:41.543Z",
+      "createdBy": "test@example.com"
+    }
+  ]
 }
