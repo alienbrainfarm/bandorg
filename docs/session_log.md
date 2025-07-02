@@ -50,17 +50,17 @@ This file tracks the work completed during each development session.
 
 ---
 
-## Session 4: Dockerization Debugging and Superadmin Login
+## Session 4: Superadmin Setup and Test Environment Refinements
+
+## Session 5: Continued Test Environment Debugging
 
 *   **Date:** 2025-07-02
-*   **Objective:** Resolve Docker container issues and superadmin login problem.
-*   **Problem:** Initial `ENOENT` error for client build files, followed by superadmin login failure (redirecting to login page after Google authentication).
-*   **Debugging Steps & Changes:**
-    *   Modified `server/src/index.js` to adjust `clientBuildPath` to an absolute path (`/app/client/build`) for Docker compatibility.
-    *   Modified `server/src/index.js` to make all email comparisons case-insensitive (`.toLowerCase()`).
-    *   Modified `Dockerfile` to correctly pass `ADMIN_EMAIL` as an `ENV` variable and ensure `authorized_users.json` is initialized with the correct lowercase admin email.
-    *   Added extensive `console.log` statements in `server/src/index.js` (GoogleStrategy callback, `deserializeUser`, `isAuthenticated`, `/api/current_user`) to trace user object and `authorized_users.json` content.
-    *   Identified that `authorized_users.json` was being incorrectly populated with literal `YOUR_ADMIN_EMAIL` due to shell expansion issues in `Dockerfile`.
-    *   Corrected `Dockerfile` to use `ENV ADMIN_EMAIL` and `tr` for lowercase conversion to ensure correct `authorized_users.json` content.
-    *   Identified that the `authorized_users.json` file on the host was overwriting the one created in the Dockerfile.
-*   **Current Status:** The `authorized_users.json` content is now correctly showing the admin email. However, the superadmin login issue persists, with the application returning to the login page after Google authentication. The `req.user` object is `undefined` in `/api/current_user` after login. Further investigation into session management and Passport.js flow is needed.
+*   **Objective:** Continue resolving `TypeError: req.isAuthenticated is not a function` and `SyntaxError: Unexpected end of JSON input` errors in tests.
+*   **Work Done:**
+    *   Created `server/src/authorizedUsers.js` to centralize `authorized_users.json` read/write operations, aiming for more robust handling.
+    *   Modified `server/src/index.js` to utilize the new `authorizedUsers.js` module for `authorized_users.json` interactions.
+    *   Adjusted `server/src/index.js` to ensure `passportConfig.js` (Passport.js setup) is only loaded and applied when `NODE_ENV` is *not* 'test'.
+    *   Introduced `server/test/testSetup.js` to provide a dedicated `testAuthMiddleware` for mocking `req.isAuthenticated` and `req.user` in the test environment.
+    *   Updated `server/test/admin.test.js` and `server/test/events.test.js` to import and use `authorizedUsersPath` from `testSetup.js` and removed previous manual mocking of `req.isAuthenticated` and `req.user`.
+    *   Attempted to run tests with a 20-second timeout using `npm test -- --timeout 20000`.
+*   **Current Status:** Despite these changes, the tests are still failing with the same `TypeError: req.isAuthenticated is not a function` and `SyntaxError: Unexpected end of JSON input` errors. This indicates that the mocking of `req.isAuthenticated` is still not effective, and there might be lingering issues with `authorized_users.json` integrity or how it's being accessed in the test environment. Further investigation into the interaction between Express, Passport, and the test setup is required.

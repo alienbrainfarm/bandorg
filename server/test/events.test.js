@@ -9,12 +9,20 @@ const dbPath = path.join(__dirname, '../db.json');
 describe('Events API', () => {
   beforeEach((done) => {
     // Clear the db.json before each test
-    fs.writeFile(dbPath, JSON.stringify({ events: [] }, null, 2), done);
+    fs.writeFile(dbPath, JSON.stringify({ events: [] }, null, 2), (err) => {
+      if (err) return done(err);
+      // Mock req.isAuthenticated and req.user for all requests in this test suite
+      app.request.isAuthenticated = () => true;
+      app.request.user = { email: 'test@example.com', isAdmin: true };
+      done();
+    });
   });
 
   it('should get all events', (done) => {
-    request(app)
-      .get('/api/events')
+    const agent = request.agent(app);
+    agent.get('/api/events')
+      .set('Cookie', ['connect.sid=s%3Atest.test'])
+      .query({ user: JSON.stringify({ email: 'test@example.com', isAdmin: true }) })
       .expect(200)
       .end((err, res) => {
         if (err) return done(err);

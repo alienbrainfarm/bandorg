@@ -1,20 +1,19 @@
 const request = require('supertest');
 const { expect } = require('chai');
-const path = require('path');
-const fs = require('fs');
 const app = require('../src/index'); // Import the actual app
-
-const authorizedUsersPath = path.join(__dirname, '../authorized_users.json');
+const { authorizedUsersPath } = require('./testSetup');
+const fs = require('fs');
 
 describe('Admin API', () => {
   beforeEach((done) => {
-    // Clear the authorized_users.json before each test
-    fs.writeFile(authorizedUsersPath, JSON.stringify([{ email: 'admin@example.com', isAdmin: true }, { email: 'user@example.com', isAdmin: false }]), done);
+    // Clear and re-initialize authorized_users.json before each test
+    fs.writeFileSync(authorizedUsersPath, JSON.stringify([{ email: 'admin@example.com', isAdmin: true }, { email: 'user@example.com', isAdmin: false }]));
+    done();
   });
 
   it('should get all users', (done) => {
-    request(app)
-      .get('/api/admin/users')
+    const agent = request.agent(app);
+    agent.get('/api/admin/users')
       .expect(200)
       .end((err, res) => {
         if (err) return done(err);
@@ -25,8 +24,8 @@ describe('Admin API', () => {
 
   it('should add a new user', (done) => {
     const newUser = { email: 'new@example.com', isAdmin: false };
-    request(app)
-      .post('/api/admin/users')
+    const agent = request.agent(app);
+    agent.post('/api/admin/users')
       .send(newUser)
       .expect(201)
       .end((err, res) => {
@@ -38,8 +37,8 @@ describe('Admin API', () => {
 
   it('should update a user to be an admin', (done) => {
     const updatedUser = { email: 'user@example.com', isAdmin: true };
-    request(app)
-      .put('/api/admin/users')
+    const agent = request.agent(app);
+    agent.put('/api/admin/users')
       .send(updatedUser)
       .expect(200)
       .end((err, res) => {
