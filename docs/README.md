@@ -8,10 +8,9 @@ Band Calendar Hub enables bands to centralize rehearsal schedules, performance d
 ## Key Features
 - Google OAuth authentication (secure, member-only access)
 - Admin interface for managing authorized users
-- Mobile-first, responsive calendar views (monthly, weekly, daily)
-- Event creation, editing, and categorization
-- Touch-optimized UI for smartphones
-- Event notifications and reminders
+- Mobile-first, responsive calendar views (monthly, weekly, daily) with improved UI
+- Enhanced event creation and editing with dynamic modal title, close button, and ESC key support
+- Prevent interaction with background elements when hamburger menu is open
 - Audit log and admin dashboard
 
 ## Technology Stack

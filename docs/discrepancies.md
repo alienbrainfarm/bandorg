@@ -14,16 +14,16 @@ This document outlines the discrepancies found between the project's documentati
 
 ## 3. Features
 
-*   **Event Management:** The PRD states that users can edit and delete their own events, and admins can delete any event. The existing tests only cover event creation and retrieval, suggesting that update and delete functionalities might be missing.
-*   **User Management:** The PRD describes a role-based access control system with admin and member roles. The current implementation seems to have a simpler user management system.
+*   **Event Management:** The PRD states that users can edit and delete their own events, and admins can delete any event. This functionality has been implemented and verified.
+*   **User Management:** The PRD describes a role-based access control system with admin and member roles. The current implementation seems to have a simpler user management system, but the admin interface visibility has been addressed.
 
 ## 4. Local Development Setup
 
-*   The `README.md` file mentions a `server/.env` file for storing environment variables, but this file is not present in the project structure. This could cause confusion for developers trying to set up the project locally.
+*   The `README.md` file mentions a `server/.env` file for storing environment variables. While this file is not committed, the `ADMIN_EMAIL` is now handled at runtime, ensuring the superadmin is always present.
 
 ## 5. Recommendations
 
 *   **Database:** Decide whether to proceed with the local `db.json` file or migrate to Google Cloud Firestore as specified in the PRD. If Firestore is the chosen path, the database logic in the server needs to be updated.
-*   **Authentication:** The current `passport-google-oauth20` implementation is functional, but it's worth considering if migrating to Firebase Authentication would offer any advantages, as suggested in the PRD.
-*   **Features:** Implement the missing event management features (edit and delete) and enhance the user management system to align with the PRD.
-*   **Documentation:** Update the `README.md` to reflect the actual project setup, including the correct database and authentication methods, and provide clear instructions for setting up the environment.
+*   **Authentication:** The current `passport-google-oauth20` implementation is functional and has been fully tested. It's worth considering if migrating to Firebase Authentication would offer any advantages, as suggested in the PRD.
+*   **Features:** The core event management features (create, edit, delete) are implemented. Further enhancements to user management can be considered.
+*   **Documentation:** The `README.md` has been updated to reflect the current project setup, including the superadmin handling and improved UI features.
