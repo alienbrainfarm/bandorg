@@ -13,6 +13,6 @@ Use this checklist to track issues found during testing. Check off issues as the
 - [x] When Adding an event "Event Details" is displayed. There is no need.
 - [x] The Event details popup needs an X so it can be closed/canceled
 - [x] Usinging ESC does not close the Event/Details popup
-- [ ] If the hamburger menu is open, dont allow buttons outside of it to be active
+- [x] If the hamburger menu is open, dont allow buttons outside of it to be active
 
 _Add new issues below as they are discovered. Check them

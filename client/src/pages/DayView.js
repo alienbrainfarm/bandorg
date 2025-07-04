@@ -87,10 +87,10 @@ const DayView = ({ user }) => {
     <div className="flex flex-col items-center min-h-screen py-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
       <div className="w-full max-w-4xl p-4">
         <div className="flex justify-between items-center mb-4">
-          <button className="icon-button hamburger-icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>&#9776;</button>
+          <button className="icon-button hamburger-icon" onClick={() => setIsMenuOpen(true)}>&#9776;</button>
           <h1 className="text-2xl font-bold">Day View</h1>
           <button className="icon-button add-icon" onClick={() => handleOpenModal({ start: new Date(), end: new Date(), title: '' })}>+</button>
-          {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} />}
+          {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} onClose={() => setIsMenuOpen(false)} />}
         </div>
         <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-4" style={{ height: '700px' }}>
           <Calendar

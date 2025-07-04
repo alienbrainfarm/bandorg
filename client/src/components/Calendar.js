@@ -100,10 +100,10 @@ const CustomCalendar = ({ user }) => {
 
   const renderHeader = () => (
     <div className="calendar-header">
-      <button className="icon-button hamburger-icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>&#9776;</button>
+      <button className="icon-button hamburger-icon" onClick={() => setIsMenuOpen(true)}>&#9776;</button>
       <span className="calendar-title">CALENDAR</span>
       <button className="icon-button add-icon" onClick={() => handleOpenModal()}>+</button>
-      {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} onManageUsersClick={handleOpenManageUsersModal} />}
+      {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} onManageUsersClick={handleOpenManageUsersModal} onClose={() => setIsMenuOpen(false)} />}
     </div>
   );
 
