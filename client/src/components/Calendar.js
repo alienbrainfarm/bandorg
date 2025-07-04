@@ -210,14 +210,16 @@ const CustomCalendar = ({ user }) => {
   };
 
   return (
-    <div className="calendar-container">
+    <div className="bg-gray-700 text-white rounded-lg p-5 shadow-lg w-full max-w-md mx-auto">
       {renderHeader()}
-      <div className="month-navigation">
-        <button onClick={() => changeMonth(-1)}>&lt;</button>
-        <h2>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h2>
-        <button onClick={() => changeMonth(1)}>&gt;</button>
+      <div className="flex justify-between items-center mb-4">
+        <button onClick={() => changeMonth(-1)} className="text-white text-2xl">&lt;</button>
+        <h2 className="text-xl font-bold">{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h2>
+        <button onClick={() => changeMonth(1)} className="text-white text-2xl">&gt;</button>
       </div>
-      {renderDays()}
+      <div className="grid grid-cols-7 text-center text-gray-400 text-sm font-bold mb-2">
+        {days.map(day => <div key={day}>{day}</div>)}
+      </div>
       {renderCells()}
       
       {isModalOpen && (
