@@ -44,6 +44,7 @@ function App() {
             </Routes>
           ) : (
             <div className="flex flex-col items-center justify-center h-full">
+              <h1 className="text-4xl font-bold mb-8">Band Calendar Hub</h1>
               <p className="mb-4">Please log in to view the calendar.</p>
               <button onClick={handleLogin} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Login with Google</button>
             </div>
