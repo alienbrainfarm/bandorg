@@ -16,35 +16,39 @@ This allows you to change the superadmin by updating the `.env` file and restart
 
 ## Implementation Example
 
-Add the following logic at the top of your `server/src/index.js` file, before the server starts:
+Add the following logic at the top of your `server/src/index.js` file, before the server starts.  
+**Important:** To avoid interfering with automated tests, only run this logic when `NODE_ENV` is not set to `'test'`:
 
 ```javascript
-// Ensure superadmin exists in authorized_users.json at runtime
-(async () => {
-  const superadminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
-  if (!superadminEmail) return;
-  try {
-    let users = [];
-    if (fs.existsSync(authorizedUsersPath)) {
-      users = JSON.parse(await fsPromises.readFile(authorizedUsersPath, 'utf8'));
+if (process.env.NODE_ENV !== 'test') {
+  // Ensure superadmin exists in authorized_users.json at runtime
+  (async () => {
+    const superadminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+    if (!superadminEmail) return;
+    try {
+      let users = [];
+      if (fs.existsSync(authorizedUsersPath)) {
+        users = JSON.parse(await fsPromises.readFile(authorizedUsersPath, 'utf8'));
+      }
+      if (!users.some(u => u.email === superadminEmail)) {
+        users.push({ email: superadminEmail, isAdmin: true });
+        await fsPromises.writeFile(authorizedUsersPath, JSON.stringify(users, null, 2));
+        console.log(`Superadmin ${superadminEmail} added to authorized_users.json`);
+      } else {
+        // Ensure superadmin is always admin
+        users = users.map(u =>
+          u.email === superadminEmail ? { ...u, isAdmin: true } : u
+        );
+        await fsPromises.writeFile(authorizedUsersPath, JSON.stringify(users, null, 2));
+      }
+    } catch (err) {
+      console.error('Error ensuring superadmin in authorized_users.json:', err);
     }
-    if (!users.some(u => u.email === superadminEmail)) {
-      users.push({ email: superadminEmail, isAdmin: true });
-      await fsPromises.writeFile(authorizedUsersPath, JSON.stringify(users, null, 2));
-      console.log(`Superadmin ${superadminEmail} added to authorized_users.json`);
-    } else {
-      // Ensure superadmin is always admin
-      users = users.map(u =>
-        u.email === superadminEmail ? { ...u, isAdmin: true } : u
-      );
-      await fsPromises.writeFile(authorizedUsersPath, JSON.stringify(users, null, 2));
-    }
-  } catch (err) {
-    console.error('Error ensuring superadmin in authorized_users.json:', err);
-  }
-})();
+  })();
+}
 ```
 
 ## Summary
 
-This approach ensures the superadmin is always present and has admin rights, based on the current `.env` at runtime, not just at build time.
+This approach ensures the superadmin is always present and has admin rights, based on the current `.env` at runtime, not just at build time.  
+By skipping this logic during tests (`NODE_ENV === 'test'`), you avoid interfering with test isolation and allow tests to control the state of `authorized_users.json` as needed.

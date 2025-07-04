@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 const authorizedUsersPath = path.join(__dirname, '../authorized_users.json');
 
+
+
 // This function will be called before each test suite
 before(() => {
   process.env.NODE_ENV = 'test'; // Ensure NODE_ENV is set to test
@@ -17,14 +19,8 @@ beforeEach((done) => {
   });
 });
 
-// Custom middleware for test environment to mock authentication
-const testAuthMiddleware = (req, res, next) => {
-  req.isAuthenticated = () => true;
-  req.user = { email: 'test@example.com', isAdmin: true }; // Default test user
-  next();
-};
+
 
 module.exports = {
-  testAuthMiddleware,
   authorizedUsersPath
 };
