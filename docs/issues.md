@@ -10,9 +10,9 @@ Use this checklist to track issues found during testing. Check off issues as the
 - [ ] Event creation and editing not functioning as expected
 - [ ] The Admin interface does not appear when called from the year/week/day menus
 - [x] The year/week/day views are ugly and not in calendar format
-- [ ] When Adding an event "Event Details" is displayed. There is no need.
-- [ ] The Event details popup needs an X so it can be closed/canceled
-- [ ] Usinging ESC does not close the Event/Details popup
+- [x] When Adding an event "Event Details" is displayed. There is no need.
+- [x] The Event details popup needs an X so it can be closed/canceled
+- [x] Usinging ESC does not close the Event/Details popup
 - [ ] If the hamburger menu is open, dont allow buttons outside of it to be active
 
 _Add new issues below as they are discovered. Check them

@@ -10,7 +10,19 @@ const EventModal = ({ event, onClose, onSave, onDelete, currentUser }) => {
     setTitle(event.title);
     setStart(event.start);
     setEnd(event.end);
-  }, [event]);
+
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+
+    return () => {
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [event, onClose]);
 
   // Helper to format Date objects for datetime-local input
   const formatDateTimeLocal = (date) => {
@@ -36,7 +48,8 @@ const EventModal = ({ event, onClose, onSave, onDelete, currentUser }) => {
   return (
     <div className="event-modal-overlay">
       <div className="event-modal dark">
-        <h2>Event Details</h2>
+        <h2>{event.id ? 'Event Details' : 'Add New Event'}</h2>
+        <button className="close-button" onClick={onClose}>&times;</button>
         <p><strong>Title:</strong>
           {(isCreator || isAdmin) ? (
             <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
