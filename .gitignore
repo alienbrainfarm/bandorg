@@ -10,6 +10,7 @@
 /client/build
 /dist
 /out
+/build.sh
 
 # Logs
 logs

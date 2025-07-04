@@ -77,3 +77,16 @@ This file tracks the work completed during each development session.
     *   Ultimately resolved the issue by modifying the `isAuthenticated` and `isAdmin` middleware functions in `server/src/index.js` to bypass authentication and authorization checks when `process.env.NODE_ENV` is set to `'test'`.
     *   Cleaned up the codebase by removing the now-unnecessary `testAuthMiddleware` and reverting the test file and `testSetup.js` to their previous state.
 *   **Current Status:** All tests are now passing, and the test environment is stable.
+
+---
+
+## Session 61: Dockerization and Debugging
+
+*   **Date:** 2025-07-04
+*   **Objective:** Resolve issues with the Docker container to enable successful login.
+*   **Work Done:**
+    *   Diagnosed and fixed a blank page issue by adding `app.use(express.static(clientBuildPath));` to `server/src/index.js` to correctly serve static files.
+    *   Corrected the `Dockerfile` to handle the `ADMIN_EMAIL` build argument gracefully, preventing a malformed `authorized_users.json` file.
+    *   Updated the `docs/README.md` to include the `ADMIN_EMAIL` in the `docker build` command.
+    *   Resolved a `Bad substitution` error in the `Dockerfile` by replacing a bash-specific command with a more portable `tr` command.
+*   **Current Status:** The Docker container now builds successfully, and users can log in to the application.

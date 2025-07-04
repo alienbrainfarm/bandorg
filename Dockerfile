@@ -35,7 +35,7 @@ COPY server/ ./
 
 ENV ADMIN_EMAIL=${ADMIN_EMAIL}
 
-RUN echo "[ { \"email\": \"$(echo ${ADMIN_EMAIL} | tr '[:upper:]' '[:lower:]')\", \"isAdmin\": true } ]" > authorized_users.json
+RUN if [ -n "$ADMIN_EMAIL" ]; then echo "[ { \"email\": \"$(echo ${ADMIN_EMAIL} | tr '[:upper:]' '[:lower:]')\", \"isAdmin\": true } ]" > authorized_users.json; else echo "[]" > authorized_users.json; fi
 
 COPY --from=build /app/client/build ./client/build
 

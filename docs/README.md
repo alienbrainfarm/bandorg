@@ -71,6 +71,7 @@ docker build \
   --build-arg GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID \
   --build-arg GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET \
   --build-arg SESSION_SECRET=YOUR_SESSION_SECRET \
+  --build-arg ADMIN_EMAIL=your-admin-email@example.com \
   -t bandorg .
 ```
 
