@@ -75,27 +75,29 @@ const isAdmin = async (req, res, next) => {
 
 
 
-// Ensure superadmin exists in authorized_users.json at runtime
-(async () => {
-  const superadminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
-  if (!superadminEmail) return;
-  try {
-    let users = await readAuthorizedUsers();
-    if (!users.some(u => u.email === superadminEmail)) {
-      users.push({ email: superadminEmail, isAdmin: true });
-      await writeAuthorizedUsers(users);
-      console.log(`Superadmin ${superadminEmail} added to authorized_users.json`);
-    } else {
-      // Ensure superadmin is always admin
-      users = users.map(u =>
-        u.email === superadminEmail ? { ...u, isAdmin: true } : u
-      );
-      await writeAuthorizedUsers(users);
+if (process.env.NODE_ENV !== 'test') {
+  // Ensure superadmin exists in authorized_users.json at runtime
+  (async () => {
+    const superadminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
+    if (!superadminEmail) return;
+    try {
+      let users = await readAuthorizedUsers();
+      if (!users.some(u => u.email === superadminEmail)) {
+        users.push({ email: superadminEmail, isAdmin: true });
+        await writeAuthorizedUsers(users);
+        console.log(`Superadmin ${superadminEmail} added to authorized_users.json`);
+      } else {
+        // Ensure superadmin is always admin
+        users = users.map(u =>
+          u.email === superadminEmail ? { ...u, isAdmin: true } : u
+        );
+        await writeAuthorizedUsers(users);
+      }
+    } catch (err) {
+      console.error('Error ensuring superadmin in authorized_users.json:', err);
     }
-  } catch (err) {
-    console.error('Error ensuring superadmin in authorized_users.json:', err);
-  }
-})();
+  })();
+}
 
 // --- Passport Configuration and Authentication Routes ---
 if (process.env.NODE_ENV !== 'test') {
