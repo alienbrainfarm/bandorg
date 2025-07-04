@@ -25,6 +25,7 @@ const WeekView = ({ user }) => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isManageUsersModalOpen, setIsManageUsersModalOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/events')
@@ -83,6 +84,15 @@ const WeekView = ({ user }) => {
     handleOpenModal({ start, end, title: '' });
   };
 
+  const handleOpenManageUsersModal = () => {
+    setIsManageUsersModalOpen(true);
+    setIsMenuOpen(false); // Close hamburger menu when opening manage users modal
+  };
+
+  const handleCloseManageUsersModal = () => {
+    setIsManageUsersModalOpen(false);
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen py-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
       <div className="w-full max-w-4xl p-4">
@@ -90,7 +100,7 @@ const WeekView = ({ user }) => {
           <button className="icon-button hamburger-icon" onClick={() => setIsMenuOpen(true)}>&#9776;</button>
           <h1 className="text-2xl font-bold">Week View</h1>
           <button className="icon-button add-icon" onClick={() => handleOpenModal({ start: new Date(), end: new Date(), title: '' })}>+</button>
-          {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} onClose={() => setIsMenuOpen(false)} />}
+          {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} onManageUsersClick={handleOpenManageUsersModal} onClose={() => setIsMenuOpen(false)} />}
         </div>
         <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-4" style={{ height: '700px' }}>
           <Calendar
@@ -113,6 +123,12 @@ const WeekView = ({ user }) => {
           onClose={handleCloseModal}
           onSave={handleSaveEvent}
           onDelete={handleDeleteEvent}
+          currentUser={user}
+        />
+      )}
+      {isManageUsersModalOpen && (
+        <ManageUsersModal
+          onClose={handleCloseManageUsersModal}
           currentUser={user}
         />
       )}
