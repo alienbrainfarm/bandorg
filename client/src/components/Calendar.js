@@ -107,96 +107,13 @@ const CustomCalendar = ({ user }) => {
     </div>
   );
 
-  const renderCells = () => {
-    const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
-    const startDate = new Date(monthStart);
-    startDate.setDate(startDate.getDate() - monthStart.getDay());
-    const endDate = new Date(monthEnd);
-    if (monthEnd.getDay() !== 6) {
-        endDate.setDate(endDate.getDate() + (6 - monthEnd.getDay()));
-    }
-
-
-    const rows = [];
-    let day = startDate;
-
-    while (day <= endDate) {
-      for (let i = 0; i < 7; i++) {
-        const cloneDay = new Date(day);
-        const isToday = cloneDay.toDateString() === new Date().toDateString();
-        const isCurrentMonth = cloneDay.getMonth() === currentDate.getMonth();
-        
-        let cellClasses = `calendar-cell ${isCurrentMonth ? "" : "disabled"} ${isToday ? "today" : ""}`;
-
-        const overlappingEvents = events.filter(e => {
-          const eventStart = new Date(e.start.getFullYear(), e.start.getMonth(), e.start.getDate());
-          const eventEnd = new Date(e.end.getFullYear(), e.end.getMonth(), e.end.getDate());
-          const currentDay = new Date(cloneDay.getFullYear(), cloneDay.getMonth(), cloneDay.getDate());
-          return currentDay >= eventStart && currentDay <= eventEnd;
-        });
-
-        if (overlappingEvents.length > 0) {
-          const multiDayEvent = overlappingEvents.find(e => {
-            const eventStart = new Date(e.start.getFullYear(), e.start.getMonth(), e.start.getDate());
-            const eventEnd = new Date(e.end.getFullYear(), e.end.getMonth(), e.end.getDate());
-            return eventStart.toDateString() !== eventEnd.toDateString();
-          });
-
-          if (multiDayEvent) {
-            const eventStartDay = new Date(multiDayEvent.start.getFullYear(), multiDayEvent.start.getMonth(), multiDayEvent.start.getDate());
-            const eventEndDay = new Date(multiDayEvent.end.getFullYear(), multiDayEvent.end.getMonth(), multiDayEvent.end.getDate());
-            const currentDay = new Date(cloneDay.getFullYear(), cloneDay.getMonth(), cloneDay.getDate());
-
-            if (currentDay.toDateString() === eventStartDay.toDateString()) {
-              cellClasses += ' event-start-of-range';
-            } else if (currentDay.toDateString() === eventEndDay.toDateString()) {
-              cellClasses += ' event-end-of-range';
-            } else {
-              cellClasses += ' event-in-range';
-            }
-            cellClasses += ' multi-day-event';
-          } else {
-            cellClasses += ' single-day-event';
-          }
-        }
-
-        days.push(
-          <div
-            className={`calendar-cell ${isCurrentMonth ? "" : "disabled"} ${isToday ? "today" : ""}`}
-            key={day}
-            onClick={() => handleDateClick(cloneDay)}
-            onMouseDown={() => handleMouseDown(cloneDay)}
-            onMouseEnter={() => handleMouseEnter(cloneDay)}
-            onMouseUp={handleMouseUp}
-          >
-            <div className={cellClasses}>
-              <span className="number">{cloneDay.getDate()}</span>
-            </div>
-          </div>
-        );
-        day.setDate(day.getDate() + 1);
-      }
-      rows.push(<div className="calendar-row" key={day}>{days}</div>);
-    }
-    return <div className="calendar-body">{rows}</div>;
+  const handleSelectEvent = (event) => {
+    handleOpenModal(event);
   };
 
-  const handleDateClick = (day) => {
-    const dayEvents = events.filter(e =>
-      e.start.toDateString() === day.toDateString()
-    );
-
-    if (dayEvents.length > 0) {
-      // If there are events, open the modal for the first event found on that day
-      handleOpenModal(dayEvents[0]);
-    } else {
-      // Otherwise, open the modal to create a new event for that day
-      handleOpenModal({ start: day, end: day, title: '' });
-    }
+  const handleSelectSlot = ({ start, end }) => {
+    handleOpenModal({ start, end, title: '' });
   };
-
-  
 
   const changeMonth = (amount) => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + amount, 1));
@@ -213,7 +130,7 @@ const CustomCalendar = ({ user }) => {
       <div className="grid grid-cols-7 text-center text-gray-400 text-sm font-bold mb-2">
         {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => <div key={day}>{day}</div>)}
       </div>
-      {renderCells()}
+      {/* Removed renderCells() as react-big-calendar handles rendering */}
       
       {isModalOpen && (
         <EventModal
