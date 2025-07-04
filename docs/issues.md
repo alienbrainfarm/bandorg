@@ -6,7 +6,7 @@ Use this checklist to track issues found during testing. Check off issues as the
 - [ ] Superadmin logic interferes with test isolation (`authorized_users.json` modified during tests)
 - [x] Placeholder title is shown on the website instead of the intended landing page
 - [x] Calendar component does not render with the correct blue/green theme
-- [ ] Google OAuth authentication flow not fully tested
+- [x] Google OAuth authentication flow not fully tested
 - [x] Event creation and editing not functioning as expected
 - [x] The Admin interface does not appear when called from the year/week/day menus
 - [x] The year/week/day views are ugly and not in calendar format
