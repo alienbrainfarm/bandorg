@@ -2,8 +2,8 @@
 
 Use this checklist to track issues found during testing. Check off issues as they are resolved.
 
-- [ ] Superadmin is only set at build time, not at runtime
-- [ ] Superadmin logic interferes with test isolation (`authorized_users.json` modified during tests)
+- [x] Superadmin is only set at build time, not at runtime
+- [x] Superadmin logic interferes with test isolation (`authorized_users.json` modified during tests)
 - [x] Placeholder title is shown on the website instead of the intended landing page
 - [x] Calendar component does not render with the correct blue/green theme
 - [x] Google OAuth authentication flow not fully tested

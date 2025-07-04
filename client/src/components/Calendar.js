@@ -107,11 +107,6 @@ const CustomCalendar = ({ user }) => {
     </div>
   );
 
-  const renderDays = () => {
-    const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-    return <div className="days-of-week">{days.map(day => <div key={day}>{day}</div>)}</div>;
-  };
-
   const renderCells = () => {
     const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -124,7 +119,6 @@ const CustomCalendar = ({ user }) => {
 
 
     const rows = [];
-    let days = [];
     let day = startDate;
 
     while (day <= endDate) {
@@ -184,7 +178,6 @@ const CustomCalendar = ({ user }) => {
         day.setDate(day.getDate() + 1);
       }
       rows.push(<div className="calendar-row" key={day}>{days}</div>);
-      days = [];
     }
     return <div className="calendar-body">{rows}</div>;
   };
@@ -218,7 +211,7 @@ const CustomCalendar = ({ user }) => {
         <button onClick={() => changeMonth(1)} className="text-white text-2xl">&gt;</button>
       </div>
       <div className="grid grid-cols-7 text-center text-gray-400 text-sm font-bold mb-2">
-        {days.map(day => <div key={day}>{day}</div>)}
+        {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => <div key={day}>{day}</div>)}
       </div>
       {renderCells()}
       

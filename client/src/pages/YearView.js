@@ -7,6 +7,7 @@ import getDay from 'date-fns/getDay';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import HamburgerMenu from '../components/HamburgerMenu';
 import EventModal from '../components/EventModal';
+import ManageUsersModal from '../components/ManageUsersModal';
 
 const locales = {
   'en-US': require('date-fns/locale/en-US'),
