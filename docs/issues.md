@@ -9,7 +9,7 @@ Use this checklist to track issues found during testing. Check off issues as the
 - [ ] Google OAuth authentication flow not fully tested
 - [ ] Event creation and editing not functioning as expected
 - [ ] The Admin interface does not appear when called from the year/week/day menus
-- [ ] The year/week/day views are ugly and not in calendar format
+- [x] The year/week/day views are ugly and not in calendar format
 - [ ] When Adding an event "Event Details" is displayed. There is no need.
 - [ ] The Event details popup needs an X so it can be closed/canceled
 - [ ] Usinging ESC does not close the Event/Details popup

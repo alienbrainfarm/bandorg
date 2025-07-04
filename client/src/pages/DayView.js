@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import format from 'date-fns/format';
+import parse from 'date-fns/parse';
+import startOfWeek from 'date-fns/startOfWeek';
+import getDay from 'date-fns/getDay';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import HamburgerMenu from '../components/HamburgerMenu';
 import EventModal from '../components/EventModal';
+
+const locales = {
+  'en-US': require('date-fns/locale/en-US'),
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
 
 const DayView = ({ user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [events, setEvents] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -58,42 +75,37 @@ const DayView = ({ user }) => {
       });
   };
 
-  const changeDay = (amount) => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(selectedDate.getDate() + amount);
-    setSelectedDate(newDate);
+  const handleSelectEvent = (event) => {
+    handleOpenModal(event);
   };
 
-  const filteredEvents = events.filter(event =>
-    event.start.toDateString() === selectedDate.toDateString()
-  ).sort((a, b) => a.start - b.start);
+  const handleSelectSlot = ({ start, end }) => {
+    handleOpenModal({ start, end, title: '' });
+  };
 
   return (
-    <div className="calendar-container">
-      <div className="calendar-header">
-        <button className="icon-button hamburger-icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>&#9776;</button>
-        <span className="calendar-title">DAY VIEW</span>
-        <button className="icon-button add-icon" onClick={() => handleOpenModal({ start: selectedDate, end: selectedDate, title: '' })}>+</button>
-        {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} />}
-      </div>
-      <div className="month-navigation">
-        <button onClick={() => changeDay(-1)}>&lt;</button>
-        <h2>{selectedDate.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</h2>
-        <button onClick={() => changeDay(1)}>&gt;</button>
-      </div>
-      <div className="view-content">
-        {filteredEvents.length > 0 ? (
-          filteredEvents.map(event => (
-            <div key={event.id} className="event-item" onClick={() => handleOpenModal(event)}>
-              <div className="event-details">
-                <span className="event-title">{event.title}</span>
-                <span className="event-date">{event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No events for this day.</p>
-        )}
+    <div className="flex flex-col items-center min-h-screen py-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
+      <div className="w-full max-w-4xl p-4">
+        <div className="flex justify-between items-center mb-4">
+          <button className="icon-button hamburger-icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>&#9776;</button>
+          <h1 className="text-2xl font-bold">Day View</h1>
+          <button className="icon-button add-icon" onClick={() => handleOpenModal({ start: new Date(), end: new Date(), title: '' })}>+</button>
+          {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} />}
+        </div>
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-4" style={{ height: '700px' }}>
+          <Calendar
+            localizer={localizer}
+            events={events}
+            defaultView="day"
+            views={['day']}
+            onSelectEvent={handleSelectEvent}
+            onSelectSlot={handleSelectSlot}
+            selectable
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: '100%' }}
+          />
+        </div>
       </div>
       {isModalOpen && (
         <EventModal

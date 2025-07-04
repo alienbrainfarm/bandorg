@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
+import format from 'date-fns/format';
+import parse from 'date-fns/parse';
+import startOfWeek from 'date-fns/startOfWeek';
+import getDay from 'date-fns/getDay';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import HamburgerMenu from '../components/HamburgerMenu';
 import EventModal from '../components/EventModal';
+
+const locales = {
+  'en-US': require('date-fns/locale/en-US'),
+};
+
+const localizer = dateFnsLocalizer({
+  format,
+  parse,
+  startOfWeek,
+  getDay,
+  locales,
+});
 
 const YearView = ({ user }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [events, setEvents] = useState([]);
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -58,40 +75,37 @@ const YearView = ({ user }) => {
       });
   };
 
-  const changeYear = (amount) => {
-    setSelectedYear(selectedYear + amount);
+  const handleSelectEvent = (event) => {
+    handleOpenModal(event);
   };
 
-  const filteredEvents = events.filter(event =>
-    event.start.getFullYear() === selectedYear
-  ).sort((a, b) => a.start - b.start);
+  const handleSelectSlot = ({ start, end }) => {
+    handleOpenModal({ start, end, title: '' });
+  };
 
   return (
-    <div className="calendar-container">
-      <div className="calendar-header">
-        <button className="icon-button hamburger-icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>&#9776;</button>
-        <span className="calendar-title">YEAR VIEW</span>
-        <button className="icon-button add-icon" onClick={() => handleOpenModal({ start: new Date(selectedYear, 0, 1), end: new Date(selectedYear, 11, 31), title: '' })}>+</button>
-        {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} />}
-      </div>
-      <div className="month-navigation">
-        <button onClick={() => changeYear(-1)}>&lt;</button>
-        <h2>{selectedYear}</h2>
-        <button onClick={() => changeYear(1)}>&gt;</button>
-      </div>
-      <div className="view-content">
-        {filteredEvents.length > 0 ? (
-          filteredEvents.map(event => (
-            <div key={event.id} className="event-item" onClick={() => handleOpenModal(event)}>
-              <div className="event-details">
-                <span className="event-title">{event.title}</span>
-                <span className="event-date">{event.start.toLocaleDateString()} {event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No events for this year.</p>
-        )}
+    <div className="flex flex-col items-center min-h-screen py-2 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
+      <div className="w-full max-w-4xl p-4">
+        <div className="flex justify-between items-center mb-4">
+          <button className="icon-button hamburger-icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>&#9776;</button>
+          <h1 className="text-2xl font-bold">Year View</h1>
+          <button className="icon-button add-icon" onClick={() => handleOpenModal({ start: new Date(), end: new Date(), title: '' })}>+</button>
+          {isMenuOpen && <HamburgerMenu user={user} onLogout={handleLogout} />}
+        </div>
+        <div className="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-4" style={{ height: '700px' }}>
+          <Calendar
+            localizer={localizer}
+            events={events}
+            defaultView="year"
+            views={['year']}
+            onSelectEvent={handleSelectEvent}
+            onSelectSlot={handleSelectSlot}
+            selectable
+            startAccessor="start"
+            endAccessor="end"
+            style={{ height: '100%' }}
+          />
+        </div>
       </div>
       {isModalOpen && (
         <EventModal
