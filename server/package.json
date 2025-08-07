@@ -1,14 +1,22 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend server for Band Calendar Hub - handles authentication, API routes, and data management",
+  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "mocha test/**/*.test.js"
+    "test": "mocha test/**/*.test.js",
+    "lint": "eslint src/ test/",
+    "lint:fix": "eslint src/ test/ --fix"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "express",
+    "passport",
+    "google-oauth",
+    "calendar",
+    "api"
+  ],
+  "author": "Band Calendar Hub Contributors",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^2.2.0",
@@ -20,7 +28,9 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.32.0",
     "chai": "^5.2.0",
+    "eslint": "^9.32.0",
     "mocha": "^11.7.1",
     "supertest": "^7.1.1"
   }

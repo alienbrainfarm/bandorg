@@ -6,13 +6,5 @@
   {
     "email": "user@example.com",
     "isAdmin": false
-  },
- {
-    "email": "john@alienmoon.net",
-    "isAdmin": false
-},
-{
-    "email": "john@alien-planet.net",
-    "isAdmin": true
-} 
+  }
 ]

@@ -1,14 +1,14 @@
 {
   "name": "bandorg",
   "version": "1.0.0",
-  "description": "",
+  "description": "A mobile-first web application for band members to securely share calendar events",
   "main": "index.js",
   "scripts": {
     "start": "concurrently \"npm run start --prefix client\" \"npm run start --prefix server\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["band", "calendar", "music", "scheduling", "google-oauth"],
+  "author": "Band Calendar Hub Contributors",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^8.2.2",

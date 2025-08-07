@@ -37,6 +37,11 @@ For local development and testing, the `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET
 
 **Important:** Never hardcode sensitive credentials directly into your code or commit them to version control.
 
+**Setup Steps:**
+1. Copy the example environment file: `cp server/.env.example server/.env`
+2. Edit `server/.env` with your actual Google OAuth credentials
+3. Follow the GCP setup instructions below to obtain your credentials
+
 ### 2. Google Cloud Platform (GCP) OAuth Setup Hints
 To obtain your `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`:
 
