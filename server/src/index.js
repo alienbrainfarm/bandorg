@@ -4,10 +4,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const fsPromises = require('fs').promises;
 const path = require('path');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
-const configurePassport = require('./passportConfig');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -47,9 +44,11 @@ const isAuthenticated = async (req, res, next) => {
         return next();
       } else {
         // User no longer authorized, log them out
-        req.logout((err) => {
-          if (err) { console.error('Error logging out unauthorized user:', err); }
-          res.status(401).send('Unauthorized: Your account is no longer authorized.');
+        return req.logout((err) => {
+          if (err) { 
+            console.error('Error logging out unauthorized user:', err); 
+          }
+          return res.status(401).send('Unauthorized: Your account is no longer authorized.');
         });
       }
     } catch (err) {
@@ -57,7 +56,7 @@ const isAuthenticated = async (req, res, next) => {
       return res.status(500).send('Internal Server Error');
     }
   } else {
-    res.status(401).send('Unauthorized');
+    return res.status(401).send('Unauthorized');
   }
 };
 
@@ -70,7 +69,7 @@ const isAdmin = async (req, res, next) => {
   if (req.isAuthenticated() && req.user.isAdmin) {
     return next();
   }
-  res.status(403).send('Forbidden');
+  return res.status(403).send('Forbidden');
 };
 
 
@@ -79,7 +78,7 @@ if (process.env.NODE_ENV !== 'test') {
   // Ensure superadmin exists in authorized_users.json at runtime
   (async () => {
     const superadminEmail = process.env.ADMIN_EMAIL?.toLowerCase();
-    if (!superadminEmail) return;
+    if (!superadminEmail) {return;}
     try {
       let users = await readAuthorizedUsers();
       if (!users.some(u => u.email === superadminEmail)) {
@@ -100,78 +99,7 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // --- Passport Configuration and Authentication Routes ---
-if (process.env.NODE_ENV !== 'test') {
-  passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: '/auth/google/callback'
-  },
-  (accessToken, refreshToken, profile, cb) => {
-    console.log('GoogleStrategy callback: profile.emails[0].value', profile.emails[0].value);
-    fs.readFile(authorizedUsersPath, 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading authorized_users.json in GoogleStrategy:', err);
-        return cb(err);
-      }
-      console.log('GoogleStrategy callback: authorizedUsersPath', authorizedUsersPath);
-      console.log('GoogleStrategy callback: authorized_users.json content', data);
-      const authorizedUsers = JSON.parse(data);
-      const userEmail = profile.emails[0].value.toLowerCase();
-
-      const foundUser = authorizedUsers.find(u => u.email === userEmail);
-
-      if (foundUser) {
-        console.log('GoogleStrategy callback: foundUser.email', foundUser.email);
-        const user = { email: userEmail, id: profile.id, isAdmin: foundUser.isAdmin };
-        return cb(null, user);
-      } else {
-        console.log('GoogleStrategy callback: Unauthorized email', userEmail);
-        return cb(null, false, { message: 'Unauthorized email.' });
-      }
-    });
-  }));
-
-  passport.serializeUser((user, done) => {
-    console.log('Serializing user:', user);
-    done(null, user);
-  });
-
-  passport.deserializeUser(async (user, done) => {
-    console.log('Deserializing user:', user);
-    try {
-      const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
-      const authorizedUsers = JSON.parse(data);
-      const foundUser = authorizedUsers.find(u => u.email.toLowerCase() === user.email.toLowerCase());
-
-      if (foundUser) {
-        console.log('Deserialized user found:', { ...user, isAdmin: foundUser.isAdmin });
-        done(null, { ...user, isAdmin: foundUser.isAdmin });
-      } else {
-        console.log('Deserialized user not found in authorized_users.json');
-        done(null, false);
-      }
-    } catch (err) {
-      console.error('Error deserializing user from authorized_users.json:', err);
-      done(err);
-    }
-  });
-
-  app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-
-  app.get('/auth/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }),
-    (req, res) => {
-      res.redirect('/');
-    }
-  );
-
-  app.get('/logout', (req, res) => {
-    req.logout((err) => {
-      if (err) { console.error('Error during logout:', err); }
-      res.redirect('/logout-success');
-    });
-  });
-}
+// Note: Passport configuration is handled in passportConfig.js
 
 
 
@@ -190,7 +118,7 @@ app.get('/api/events', isAuthenticated, (req, res) => {
     if (err) {
       return res.status(500).send('Error reading database.');
     }
-    res.json(JSON.parse(data).events);
+    return res.json(JSON.parse(data).events);
   });
 });
 
@@ -219,7 +147,7 @@ app.put('/api/events/:id', isAuthenticated, (req, res) => {
     if (err) {
       return res.status(500).send('Error reading database.');
     }
-    let db = JSON.parse(data);
+    const db = JSON.parse(data);
     const eventId = parseInt(req.params.id);
     const eventIndex = db.events.findIndex(e => e.id === eventId);
 
@@ -250,7 +178,7 @@ app.delete('/api/events/:id', isAuthenticated, (req, res) => {
     if (err) {
       return res.status(500).send('Error reading database.');
     }
-    let db = JSON.parse(data);
+    const db = JSON.parse(data);
     const eventId = parseInt(req.params.id);
     const eventIndex = db.events.findIndex(e => e.id === eventId);
 
@@ -313,7 +241,7 @@ app.post('/api/admin/users', isAdmin, async (req, res) => {
 app.put('/api/admin/users', isAdmin, async (req, res) => {
   try {
     const data = await fsPromises.readFile(authorizedUsersPath, 'utf8');
-    let authorizedUsers = JSON.parse(data);
+    const authorizedUsers = JSON.parse(data);
     const { email, isAdmin: updatedIsAdmin } = req.body;
 
     if (!email) {

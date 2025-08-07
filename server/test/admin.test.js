@@ -1,3 +1,10 @@
+// Set test environment variables before any modules are loaded
+process.env.NODE_ENV = 'test';
+process.env.GOOGLE_CLIENT_ID = 'test_client_id';
+process.env.GOOGLE_CLIENT_SECRET = 'test_client_secret';
+process.env.SESSION_SECRET = 'test_session_secret';
+process.env.ADMIN_EMAIL = 'admin@example.com';
+
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../src/index'); // Import the actual app
@@ -16,7 +23,7 @@ describe('Admin API', () => {
     agent.get('/api/admin/users')
       .expect(200)
       .end((err, res) => {
-        if (err) return done(err);
+        if (err) {return done(err);}
         expect(res.body).to.be.an('array').with.lengthOf(2);
         done();
       });
@@ -29,7 +36,7 @@ describe('Admin API', () => {
       .send(newUser)
       .expect(201)
       .end((err, res) => {
-        if (err) return done(err);
+        if (err) {return done(err);}
         expect(res.body).to.be.an('array').with.lengthOf(3);
         done();
       });
@@ -42,7 +49,7 @@ describe('Admin API', () => {
       .send(updatedUser)
       .expect(200)
       .end((err, res) => {
-        if (err) return done(err);
+        if (err) {return done(err);}
         const updatedUserFromFile = res.body.find(u => u.email === 'user@example.com');
         expect(updatedUserFromFile.isAdmin).to.be.true;
         done();
@@ -56,7 +63,7 @@ describe('Admin API', () => {
       .send(userToDelete)
       .expect(200)
       .end((err, res) => {
-        if (err) return done(err);
+        if (err) {return done(err);}
         expect(res.body).to.be.an('array').with.lengthOf(1);
         done();
       });
@@ -70,7 +77,7 @@ describe('Admin API', () => {
       .send(userToDelete)
       .expect(403)
       .end((err, res) => {
-        if (err) return done(err);
+        if (err) {return done(err);}
         done();
       });
   });
