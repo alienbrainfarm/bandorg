@@ -44,9 +44,11 @@ const isAuthenticated = async (req, res, next) => {
         return next();
       } else {
         // User no longer authorized, log them out
-        req.logout((err) => {
-          if (err) { console.error('Error logging out unauthorized user:', err); }
-          res.status(401).send('Unauthorized: Your account is no longer authorized.');
+        return req.logout((err) => {
+          if (err) { 
+            console.error('Error logging out unauthorized user:', err); 
+          }
+          return res.status(401).send('Unauthorized: Your account is no longer authorized.');
         });
       }
     } catch (err) {
@@ -54,7 +56,7 @@ const isAuthenticated = async (req, res, next) => {
       return res.status(500).send('Internal Server Error');
     }
   } else {
-    res.status(401).send('Unauthorized');
+    return res.status(401).send('Unauthorized');
   }
 };
 
@@ -67,7 +69,7 @@ const isAdmin = async (req, res, next) => {
   if (req.isAuthenticated() && req.user.isAdmin) {
     return next();
   }
-  res.status(403).send('Forbidden');
+  return res.status(403).send('Forbidden');
 };
 
 
@@ -116,7 +118,7 @@ app.get('/api/events', isAuthenticated, (req, res) => {
     if (err) {
       return res.status(500).send('Error reading database.');
     }
-    res.json(JSON.parse(data).events);
+    return res.json(JSON.parse(data).events);
   });
 });
 
